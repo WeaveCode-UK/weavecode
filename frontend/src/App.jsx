@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AuthAPI } from './lib/api'
 import { getToken, setToken, clearToken } from './lib/auth'
+import Checkout from './pages/Checkout'
+import Contact from './pages/Contact'
 
 function Home() {
   return (
@@ -126,6 +128,8 @@ export default function App() {
             <Link to="/pricing">Preços</Link>
             <Link to="/customers">Clientes</Link>
             <Link to="/about">Sobre</Link>
+            <Link to="/checkout">Checkout</Link>
+            <Link to="/contact">Contato</Link>
             {user ? <LogoutButton /> : <>
               <Link to="/login">Entrar</Link>
               <Link to="/register">Registrar</Link>
@@ -140,6 +144,8 @@ export default function App() {
         <Route path="/login" element={<Login onLogin={(token) => { setToken(token); AuthAPI.me().then(setUser); }} />} />
         <Route path="/register" element={<Register onRegistered={() => { /* opcional: redirecionar */ }} />} />
         <Route path="/customers" element={user ? <Customers /> : <Navigate to="/login" />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </BrowserRouter>
   )
