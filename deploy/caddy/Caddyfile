@@ -1,0 +1,135 @@
+# Caddyfile para WeaveCode - Reverse Proxy com SSL automático
+# Caddy v2+ syntax
+
+# Configuração global
+{
+    # Configurações de email para Let's Encrypt
+    email info@weavecode.co.uk
+    
+    # Logs estruturados
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+}
+
+# Domínio principal (substitua pelo seu domínio real)
+weavecode.co.uk {
+    # Redirecionar HTTP para HTTPS
+    redir https://{host}{uri} permanent
+    
+    # Configurações de segurança
+    header {
+        # Headers de segurança
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+        
+        # CORS para desenvolvimento
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization"
+    }
+    
+    # Frontend (React SPA)
+    @frontend {
+        path_regexp ^/(?!api/).*
+    }
+    handle @frontend {
+        root * /var/www/frontend
+        try_files {path} /index.html
+        file_server
+        
+        # Cache para assets estáticos
+        @static {
+            path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+        }
+        header @static Cache-Control "public, max-age=31536000"
+    }
+    
+    # Backend API
+    @api {
+        path /api/*
+    }
+    handle @api {
+        reverse_proxy backend:4000 {
+            # Health checks
+            health_uri /api/health
+            health_interval 30s
+            health_timeout 10s
+            
+            # Load balancing (quando tiver múltiplas instâncias)
+            lb_policy round_robin
+            
+            # Headers para proxy
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+            header_up Host {host}
+        }
+    }
+    
+    # Health check endpoint
+    @health {
+        path /health
+    }
+    handle @health {
+        respond "OK" 200
+    }
+    
+    # Logs de erro
+    log {
+        output file /var/log/caddy/error.log
+        level ERROR
+    }
+}
+
+# Subdomínio para admin (opcional)
+admin.weavecode.co.uk {
+    # Redirecionar HTTP para HTTPS
+    redir https://{host}{uri} permanent
+    
+    # Autenticação básica para área admin
+    basicauth /* {
+        admin JDJhJDEwJEV4WXdBV2RsQmFVRXVGRHdaSThiS3VPS0VzaGRQOXJ1TU1VbkVPejhRZE1GaXowM0M=
+    }
+    
+    # Backend admin (mesmo backend, mas com middleware de admin)
+    reverse_proxy backend:4000 {
+        header_up X-Admin-Request true
+    }
+}
+
+# Configuração para desenvolvimento local
+localhost, 127.0.0.1 {
+    # Desabilitar SSL para localhost
+    tls internal
+    
+    # Frontend
+    @frontend {
+        path_regexp ^/(?!api/).*
+    }
+    handle @frontend {
+        root * /var/www/frontend
+        try_files {path} /index.html
+        file_server
+    }
+    
+    # Backend API
+    @api {
+        path /api/*
+    }
+    handle @api {
+        reverse_proxy backend:4000
+    }
+    
+    # Health check
+    @health {
+        path /health
+    }
+    handle @health {
+        respond "OK" 200
+    }
+}

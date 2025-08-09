@@ -1,0 +1,119 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente para deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Build Backend Image
+      working-directory: ./backend
+      run: |
+        docker build -t weavecode-backend:${{ github.sha }} .
+        
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          # Criar diretório de deploy se não existir
+          mkdir -p /opt/weavecode
+          cd /opt/weavecode
+          
+          # Backup do banco atual
+          echo "Fazendo backup do banco..."
+          docker exec weavecode-postgres pg_dump -U postgres -d weavecode > backup_$(date +%Y%m%d_%H%M%S).sql
+          
+          # Parar containers atuais
+          echo "Parando containers..."
+          docker-compose down
+          
+          # Pull das últimas mudanças
+          echo "Atualizando código..."
+          git pull origin main
+          
+          # Copiar build do frontend
+          echo "Copiando build do frontend..."
+          cp -r frontend/dist/* /var/www/frontend/
+          
+          # Atualizar imagens Docker
+          echo "Atualizando imagens..."
+          docker-compose pull
+          docker-compose build --no-cache
+          
+          # Aplicar migrações do banco
+          echo "Aplicando migrações..."
+          docker-compose run --rm backend npx prisma migrate deploy
+          
+          # Subir novos containers
+          echo "Subindo containers..."
+          docker-compose up -d
+          
+          # Verificar saúde dos serviços
+          echo "Verificando saúde dos serviços..."
+          sleep 10
+          
+          # Health check
+          if curl -f http://localhost/api/health; then
+            echo "✅ Deploy concluído com sucesso!"
+          else
+            echo "❌ Erro no health check. Revertendo..."
+            docker-compose down
+            docker-compose up -d
+            exit 1
+          fi
+          
+          # Limpar imagens antigas
+          echo "Limpando imagens antigas..."
+          docker image prune -f
+          
+          echo "Deploy finalizado em $(date)"
+          
+    - name: Notify on Success
+      if: success()
+      run: |
+        echo "✅ Deploy para ${{ github.event.inputs.environment || 'production' }} concluído com sucesso!"
+        echo "Commit: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+        
+    - name: Notify on Failure
+      if: failure()
+      run: |
+        echo "❌ Deploy para ${{ github.event.inputs.environment || 'production' }} falhou!"
+        echo "Commit: ${{ github.sha }}"
+        echo "Branch: ${{ github.ref_name }}"
+        echo "Verifique os logs do VPS para mais detalhes."
