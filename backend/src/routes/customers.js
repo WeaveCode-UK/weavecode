@@ -1,14 +1,15 @@
 import { Router } from 'express'
 import Customer from '../models/Customer.js'
+import requireAuth from '../middleware/requireAuth.js'
 
 const router = Router()
 
-router.get('/', async (_req, res) => {
+router.get('/', requireAuth, async (_req, res) => {
   const customers = await Customer.find().sort({ createdAt: -1 })
   res.json(customers)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const customer = await Customer.create(req.body)
     res.status(201).json(customer)
@@ -17,7 +18,7 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAuth, async (req, res) => {
   try {
     const updated = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true })
     if (!updated) return res.status(404).json({ error: 'Not found' })
@@ -27,7 +28,7 @@ router.put('/:id', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const deleted = await Customer.findByIdAndDelete(req.params.id)
     if (!deleted) return res.status(404).json({ error: 'Not found' })
