@@ -9,6 +9,7 @@ import authRouter from './src/routes/auth.js'
 import paymentsRouter from './src/routes/payments.js'
 import supportRouter from './src/routes/support.js'
 import emailRouter from './src/routes/email.js'
+import customersRouter from './src/routes/customers.js'
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/payments', paymentsRouter)
 app.use('/api/support', supportRouter)
 app.use('/api/email', emailRouter)
+app.use('/api/customers', customersRouter)
 
 async function start() {
   let uri = mongoUri
@@ -40,6 +42,9 @@ async function start() {
     uri = mem.getUri('weavecode')
     await mongoose.connect(uri)
   }
+  // Log seguro do destino da conexão (sem credenciais)
+  const usingAtlas = uri.startsWith('mongodb+srv')
+  console.log(`Mongo connected target: ${usingAtlas ? 'atlas' : 'local/memory'}`)
   app.listen(port, () => {
     console.log(`API listening on http://localhost:${port}`)
   })
