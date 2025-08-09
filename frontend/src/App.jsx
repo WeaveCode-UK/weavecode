@@ -1,4 +1,7 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { AuthAPI } from './lib/api'
+import { getToken, setToken, clearToken } from './lib/auth'
 
 function Home() {
   return (
@@ -96,6 +99,23 @@ function About() {
 }
 
 export default function App() {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const token = getToken()
+    if (!token) { setLoading(false); return }
+    AuthAPI.me().then(setUser).catch(() => clearToken()).finally(() => setLoading(false))
+  }, [])
+
+  function LogoutButton() {
+    return (
+      <button onClick={() => { clearToken(); setUser(null) }} className="text-sm text-gray-600">Sair</button>
+    )
+  }
+
+  if (loading) return <div className="p-6">Carregando...</div>
+
   return (
     <BrowserRouter>
       <header className="border-b">
@@ -104,7 +124,9 @@ export default function App() {
           <nav className="flex gap-4 text-sm text-gray-600">
             <Link to="/">Home</Link>
             <Link to="/pricing">Preços</Link>
+            <Link to="/customers">Clientes</Link>
             <Link to="/about">Sobre</Link>
+            {user ? <LogoutButton /> : <Link to="/login">Entrar</Link>}
           </nav>
         </div>
       </header>
@@ -112,7 +134,62 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login onLogin={(token) => { setToken(token); AuthAPI.me().then(setUser); }} />} />
+        <Route path="/customers" element={user ? <Customers /> : <Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
+  )
+}
+
+function Login({ onLogin }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      const res = await AuthAPI.login(email, password)
+      onLogin(res.token)
+    } catch (e) {
+      setError('Falha no login')
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-md px-6 py-10">
+      <h1 className="text-2xl font-semibold mb-4">Entrar</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input className="w-full border px-3 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Entrar</button>
+      </form>
+    </main>
+  )
+}
+
+function Customers() {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  useEffect(() => {
+    import('./lib/api').then(({ CustomersAPI }) => CustomersAPI.list().then(setItems).catch(() => setError('Falha ao carregar')).finally(() => setLoading(false)))
+  }, [])
+  if (loading) return <div className="p-6">Carregando...</div>
+  if (error) return <div className="p-6 text-red-600">{error}</div>
+  return (
+    <main className="mx-auto max-w-5xl px-6 py-10">
+      <h1 className="text-2xl font-semibold">Clientes</h1>
+      <ul className="mt-4 divide-y">
+        {items.map((c) => (
+          <li key={c._id} className="py-3">
+            <div className="font-medium">{c.name}</div>
+            <div className="text-sm text-gray-600">{c.email} · {c.phone}</div>
+          </li>
+        ))}
+      </ul>
+    </main>
   )
 }
