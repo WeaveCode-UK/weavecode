@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "WeaveCode backend (Express/Mongo/JWT/Payments)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "WeaveCode",
+  "license": "MIT",
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.1",
+    "morgan": "^1.10.1",
+    "paypal-rest-sdk": "^1.8.1",
+    "stripe": "^18.4.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.2.0",
+    "nodemon": "^3.1.10"
+  }
+}
