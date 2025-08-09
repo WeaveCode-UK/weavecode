@@ -3,8 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
-import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server'
+import prisma from './src/lib/prisma.js'
 import authRouter from './src/routes/auth.js'
 import paymentsRouter from './src/routes/payments.js'
 import supportRouter from './src/routes/support.js'
@@ -15,15 +14,19 @@ dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 4000
-const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/weavecode'
 
 app.use(helmet())
 app.use(cors())
 app.use(express.json())
 app.use(morgan('dev'))
 
-app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, service: 'weavecode-backend', time: new Date().toISOString() })
+app.get('/api/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1;`
+    res.json({ ok: true, service: 'weavecode-backend', db: 'postgres', time: new Date().toISOString() })
+  } catch {
+    res.status(500).json({ ok: false, service: 'weavecode-backend', db: 'postgres', error: 'db' })
+  }
 })
 
 app.use('/api/auth', authRouter)
@@ -33,18 +36,13 @@ app.use('/api/email', emailRouter)
 app.use('/api/customers', customersRouter)
 
 async function start() {
-  let uri = mongoUri
   try {
-    await mongoose.connect(uri)
-  } catch (err) {
-    console.warn('Mongo connection failed, starting in-memory server for dev:', err?.message)
-    const mem = await MongoMemoryServer.create()
-    uri = mem.getUri('weavecode')
-    await mongoose.connect(uri)
+    await prisma.$connect()
+    console.log('Prisma connected to Postgres')
+  } catch (e) {
+    console.error('Failed to connect to Postgres via Prisma:', e)
+    process.exit(1)
   }
-  // Log seguro do destino da conexão (sem credenciais)
-  const usingAtlas = uri.startsWith('mongodb+srv')
-  console.log(`Mongo connected target: ${usingAtlas ? 'atlas' : 'local/memory'}`)
   app.listen(port, () => {
     console.log(`API listening on http://localhost:${port}`)
   })

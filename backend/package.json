@@ -1,12 +1,15 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "WeaveCode backend (Express/Mongo/JWT/Payments)",
+  "description": "WeaveCode backend (Express/Postgres/Prisma/JWT/Payments)",
   "type": "module",
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "WeaveCode",
@@ -19,13 +22,14 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1",
     "morgan": "^1.10.1",
     "paypal-rest-sdk": "^1.8.1",
-    "stripe": "^18.4.0"
+    "stripe": "^18.4.0",
+    "@prisma/client": "^5.18.0",
+    "pg": "^8.11.5"
   },
   "devDependencies": {
-    "mongodb-memory-server": "^10.2.0",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "prisma": "^5.18.0"
   }
 }
