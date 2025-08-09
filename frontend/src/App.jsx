@@ -126,7 +126,10 @@ export default function App() {
             <Link to="/pricing">Preços</Link>
             <Link to="/customers">Clientes</Link>
             <Link to="/about">Sobre</Link>
-            {user ? <LogoutButton /> : <Link to="/login">Entrar</Link>}
+            {user ? <LogoutButton /> : <>
+              <Link to="/login">Entrar</Link>
+              <Link to="/register">Registrar</Link>
+            </>}
           </nav>
         </div>
       </header>
@@ -135,6 +138,7 @@ export default function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login onLogin={(token) => { setToken(token); AuthAPI.me().then(setUser); }} />} />
+        <Route path="/register" element={<Register onRegistered={() => { /* opcional: redirecionar */ }} />} />
         <Route path="/customers" element={user ? <Customers /> : <Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
@@ -174,6 +178,8 @@ function Customers() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' })
+  const [saving, setSaving] = useState(false)
   useEffect(() => {
     import('./lib/api').then(({ CustomersAPI }) => CustomersAPI.list().then(setItems).catch(() => setError('Falha ao carregar')).finally(() => setLoading(false)))
   }, [])
@@ -182,6 +188,26 @@ function Customers() {
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
       <h1 className="text-2xl font-semibold">Clientes</h1>
+      <form className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3" onSubmit={async (e) => {
+        e.preventDefault()
+        setSaving(true)
+        try {
+          const { CustomersAPI } = await import('./lib/api')
+          const created = await CustomersAPI.create(form)
+          setItems((prev) => [created, ...prev])
+          setForm({ name: '', email: '', phone: '', notes: '' })
+        } catch {
+          alert('Falha ao criar cliente')
+        } finally {
+          setSaving(false)
+        }
+      }}>
+        <input required className="border px-3 py-2" placeholder="Nome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input required className="border px-3 py-2" placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        <input className="border px-3 py-2" placeholder="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <input className="border px-3 py-2 sm:col-span-2" placeholder="Notas" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+        <button disabled={saving} className="px-4 py-2 rounded bg-primary text-white sm:col-span-2" type="submit">{saving ? 'Salvando...' : 'Adicionar cliente'}</button>
+      </form>
       <ul className="mt-4 divide-y">
         {items.map((c) => (
           <li key={c._id} className="py-3">
@@ -190,6 +216,40 @@ function Customers() {
           </li>
         ))}
       </ul>
+    </main>
+  )
+}
+
+function Register({ onRegistered }) {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [ok, setOk] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    try {
+      await AuthAPI.register(name, email, password)
+      setOk(true)
+      onRegistered?.()
+    } catch (e) {
+      setError('Falha no registro')
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-md px-6 py-10">
+      <h1 className="text-2xl font-semibold mb-4">Registrar</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input className="w-full border px-3 py-2" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {ok && <p className="text-green-700 text-sm">Registrado com sucesso. Faça login.</p>}
+        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Registrar</button>
+      </form>
     </main>
   )
 }
