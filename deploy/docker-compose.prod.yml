@@ -1,0 +1,139 @@
+version: '3.8'
+
+services:
+  # Backend Node.js
+  backend:
+    image: weavecode-backend:latest
+    container_name: weavecode-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
+      - PAYPAL_CLIENT_SECRET=${PAYPAL_CLIENT_SECRET}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - CHATWOOT_API_KEY=${CHATWOOT_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - weavecode-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: weavecode-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=weavecode
+      - POSTGRES_USER=weavecode
+      - POSTGRES_PASSWORD=weavecode123
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/backups:/backups
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - weavecode-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weavecode -d weavecode"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Redis (para cache e sessões)
+  redis:
+    image: redis:7-alpine
+    container_name: weavecode-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass weavecode123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - weavecode-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Caddy (Reverse Proxy + SSL)
+  caddy:
+    image: caddy:2-alpine
+    container_name: weavecode-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./ssl:/etc/caddy/ssl
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - weavecode-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "caddy", "version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Chatwoot (futuro - comentado por enquanto)
+  # chatwoot:
+  #   image: chatwoot/chatwoot:latest
+  #   container_name: weavecode-chatwoot
+  #   restart: unless-stopped
+  #   environment:
+  #     - RAILS_ENV=production
+  #     - DATABASE_URL=${CHATWOOT_DATABASE_URL}
+  #     - REDIS_URL=redis://:weavecode123@redis:6379/1
+  #     - FRONTEND_URL=https://seu-dominio.com
+  #     - INSTALLATION_NAME=WeaveCode Support
+  #   volumes:
+  #     - chatwoot_data:/app/storage
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - weavecode-network
+  #   depends_on:
+  #     - postgres
+  #     - redis
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
+
+networks:
+  weavecode-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

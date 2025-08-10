@@ -1,0 +1,124 @@
+# WeaveCode Production Caddyfile
+# Substitua 'seu-dominio.com' pelo seu domínio real
+
+# Configurações globais
+{
+    # Logs estruturados
+    log {
+        output file /var/log/caddy/weavecode.log
+        format json
+        level INFO
+    }
+    
+    # Auto-HTTPS com Let's Encrypt
+    auto_https disable_redirects
+    
+    # Headers de segurança
+    servers {
+        protocols h1 h2
+        strict_sni_host insecure_off
+    }
+}
+
+# HTTP -> HTTPS redirect
+:80 {
+    redir https://{host}{uri} permanent
+}
+
+# HTTPS configuration
+:443 {
+    # SUBSTITUA PELO SEU DOMÍNIO REAL
+    # tls seu-email@weavecode.co.uk
+    
+    # Headers de segurança
+    header {
+        # Proteção XSS
+        X-XSS-Protection "1; mode=block"
+        # Previne clickjacking
+        X-Frame-Options "DENY"
+        # Tipo de conteúdo
+        X-Content-Type-Options "nosniff"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Content Security Policy
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.paypal.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://api.paypal.com; frame-src https://js.stripe.com https://www.paypal.com;"
+        # HSTS (HTTP Strict Transport Security)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # Remove headers que podem expor informações
+        -Server
+        -X-Powered-By
+    }
+    
+    # Rate limiting para API
+    @api {
+        path /api/*
+    }
+    
+    # Rate limiting: 100 requests por minuto para API
+    rate_limit @api {
+        zone api
+        rate 100r/m
+        burst 200
+    }
+    
+    # Reverse proxy para o backend
+    reverse_proxy localhost:4000 {
+        # Headers de proxy
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+        header_up X-Forwarded-Host {host}
+        
+        # Timeouts
+        timeout 30s
+        
+        # Health check
+        health_uri /health
+        health_interval 30s
+        health_timeout 10s
+        
+        # Load balancing (para futuras expansões)
+        lb_policy round_robin
+        
+        # Failover
+        lb_try_duration 10s
+        lb_try_interval 250ms
+    }
+    
+    # Gzip compression
+    encode gzip
+    
+    # Cache estático (para futuras otimizações)
+    @static {
+        file
+        path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot
+    }
+    
+    header @static Cache-Control "public, max-age=31536000"
+    
+    # Logs específicos
+    log {
+        output file /var/log/caddy/weavecode_access.log
+        format json
+        level INFO
+    }
+}
+
+# Health check endpoint (acessível via HTTP)
+:4000/health {
+    respond "OK" 200
+    header Content-Type "text/plain"
+}
+
+# Endpoint de status para monitoramento
+:4000/status {
+    respond "WeaveCode API is running" 200
+    header Content-Type "text/plain"
+}
+
+# Endpoint de métricas (para futuras integrações)
+:4000/metrics {
+    respond "Metrics endpoint - implementar conforme necessário" 200
+    header Content-Type "text/plain"
+}

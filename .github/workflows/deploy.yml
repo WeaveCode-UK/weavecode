@@ -1,21 +1,12 @@
-name: Deploy to VPS
+name: Build and Deploy to VPS
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Ambiente para deploy'
-        required: true
-        default: 'production'
-        type: choice
-        options:
-        - production
-        - staging
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -28,9 +19,6 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
-    - name: Setup Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      
     - name: Build Frontend
       working-directory: ./frontend
       run: |
@@ -50,70 +38,80 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          # Criar diretório de deploy se não existir
-          mkdir -p /opt/weavecode
+          echo "🚀 Iniciando deploy do WeaveCode..."
           cd /opt/weavecode
           
-          # Backup do banco atual
-          echo "Fazendo backup do banco..."
-          docker exec weavecode-postgres pg_dump -U postgres -d weavecode > backup_$(date +%Y%m%d_%H%M%S).sql
+          # Parar serviços existentes
+          echo "⏹️ Parando serviços..."
+          docker-compose -f deploy/docker-compose.prod.yml down || true
           
-          # Parar containers atuais
-          echo "Parando containers..."
-          docker-compose down
+          # Fazer backup do banco
+          echo "💾 Fazendo backup do banco..."
+          ./backup-postgres.sh || true
           
-          # Pull das últimas mudanças
-          echo "Atualizando código..."
+          # Atualizar código
+          echo "📥 Atualizando código..."
           git pull origin main
           
-          # Copiar build do frontend
-          echo "Copiando build do frontend..."
-          cp -r frontend/dist/* /var/www/frontend/
+          # Copiar arquivos de produção
+          echo "📋 Copiando arquivos de produção..."
+          cp deploy/docker-compose.prod.yml docker-compose.yml
+          cp deploy/Caddyfile Caddyfile
           
-          # Atualizar imagens Docker
-          echo "Atualizando imagens..."
-          docker-compose pull
-          docker-compose build --no-cache
-          
-          # Aplicar migrações do banco
-          echo "Aplicando migrações..."
-          docker-compose run --rm backend npx prisma migrate deploy
-          
-          # Subir novos containers
-          echo "Subindo containers..."
-          docker-compose up -d
-          
-          # Verificar saúde dos serviços
-          echo "Verificando saúde dos serviços..."
-          sleep 10
-          
-          # Health check
-          if curl -f http://localhost/api/health; then
-            echo "✅ Deploy concluído com sucesso!"
-          else
-            echo "❌ Erro no health check. Revertendo..."
-            docker-compose down
-            docker-compose up -d
-            exit 1
+          # Configurar variáveis de ambiente
+          echo "⚙️ Configurando variáveis de ambiente..."
+          if [ ! -f .env ]; then
+            cat > .env << 'EOF'
+          NODE_ENV=production
+          PORT=4000
+          JWT_SECRET=weavecode_jwt_secret_production_$(date +%s)
+          DATABASE_URL=postgresql://weavecode:weavecode123@postgres:5432/weavecode
+          STRIPE_SECRET_KEY=sk_test_placeholder
+          PAYPAL_CLIENT_ID=placeholder
+          PAYPAL_CLIENT_SECRET=placeholder
+          SENDGRID_API_KEY=placeholder
+          CHATWOOT_API_KEY=placeholder
+          EOF
           fi
           
-          # Limpar imagens antigas
-          echo "Limpando imagens antigas..."
-          docker image prune -f
+          # Subir serviços
+          echo "🚀 Subindo serviços..."
+          docker-compose up -d
           
-          echo "Deploy finalizado em $(date)"
+          # Aguardar serviços ficarem saudáveis
+          echo "⏳ Aguardando serviços ficarem saudáveis..."
+          sleep 30
           
-    - name: Notify on Success
+          # Verificar saúde dos serviços
+          echo "🔍 Verificando saúde dos serviços..."
+          ./health-check.sh
+          
+          echo "✅ Deploy concluído com sucesso!"
+        
+    - name: Health Check
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          cd /opt/weavecode
+          echo "🔍 Verificação final de saúde..."
+          ./health-check.sh
+          
+    - name: Notify Success
       if: success()
       run: |
-        echo "✅ Deploy para ${{ github.event.inputs.environment || 'production' }} concluído com sucesso!"
+        echo "✅ Deploy concluído com sucesso!"
         echo "Commit: ${{ github.sha }}"
         echo "Branch: ${{ github.ref_name }}"
+        echo "VPS: ${{ secrets.VPS_HOST }}"
         
-    - name: Notify on Failure
+    - name: Notify Failure
       if: failure()
       run: |
-        echo "❌ Deploy para ${{ github.event.inputs.environment || 'production' }} falhou!"
+        echo "❌ Deploy falhou!"
         echo "Commit: ${{ github.sha }}"
         echo "Branch: ${{ github.ref_name }}"
-        echo "Verifique os logs do VPS para mais detalhes."
+        echo "VPS: ${{ secrets.VPS_HOST }}"
