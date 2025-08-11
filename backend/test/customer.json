@@ -1,8 +1,8 @@
 {
-  "name": "Cliente Teste",
-  "email": "cliente.teste@weavecode.co.uk",
-  "phone": "+44 0000 000000",
-  "notes": "Primeiro cliente"
+  "name": "Test Customer",
+  "email": "test.customer@weavecode.co.uk",
+  "phone": "+44 20 1234 5678",
+  "notes": "First customer"
 }
 
 

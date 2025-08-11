@@ -5,75 +5,75 @@ dotenv.config()
 
 const { Pool } = pg
 
-// Configuração da conexão PostgreSQL
+// PostgreSQL connection configuration
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20, // Máximo de conexões no pool
-  idleTimeoutMillis: 30000, // Tempo limite para conexões ociosas
-  connectionTimeoutMillis: 2000, // Tempo limite para estabelecer conexão
+  max: 20, // Maximum connections in pool
+  idleTimeoutMillis: 30000, // Idle connection timeout
+  connectionTimeoutMillis: 2000, // Connection establishment timeout
 })
 
-// Testar conexão
+// Test connection
 pool.on('connect', () => {
-  console.log('✅ PostgreSQL conectado via driver pg')
+  console.log('✅ PostgreSQL connected via pg driver')
 })
 
 pool.on('error', (err) => {
-  console.error('❌ Erro na conexão PostgreSQL:', err)
+  console.error('❌ PostgreSQL connection error:', err)
 })
 
-// Função para executar queries
+// Function to execute queries
 export async function query(text, params) {
   const start = Date.now()
   try {
     const res = await pool.query(text, params)
     const duration = Date.now() - start
-    console.log(`📊 Query executada em ${duration}ms`)
+    console.log(`📊 Query executed in ${duration}ms`)
     return res
   } catch (error) {
-    console.error('❌ Erro na query:', error)
+    console.error('❌ Query error:', error)
     throw error
   }
 }
 
-// Função para executar uma única query
+// Function to execute a single query
 export async function getClient() {
   const client = await pool.connect()
   const query = client.query
   const release = client.release
   
-  // Interceptar queries para logging
+  // Intercept queries for logging
   client.query = (...args) => {
     client.lastQuery = args
     return query.apply(client, args)
   }
   
-  // Interceptar release para logging
+  // Intercept release for logging
   client.release = () => {
-    console.log('🔌 Cliente PostgreSQL liberado')
+    console.log('🔌 PostgreSQL client released')
     return release.apply(client)
   }
   
   return client
 }
 
-// Função para testar conexão
+// Function to test connection
 export async function testConnection() {
   try {
     const result = await query('SELECT NOW() as current_time')
-    console.log('✅ Teste de conexão PostgreSQL:', result.rows[0])
+    console.log('✅ PostgreSQL connection test:', result.rows[0])
     return true
   } catch (error) {
-    console.error('❌ Falha no teste de conexão PostgreSQL:', error)
+    console.error('❌ PostgreSQL connection test failed:', error)
     return false
   }
 }
 
-// Função para fechar pool (usar apenas no shutdown)
+// Function to close pool (use only on shutdown)
 export async function closePool() {
   await pool.end()
-  console.log('🔌 Pool PostgreSQL fechado')
+  console.log('🔌 PostgreSQL pool closed')
 }
 
 export default pool

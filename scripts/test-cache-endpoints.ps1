@@ -1,42 +1,42 @@
-# 🧪 TESTE ENDPOINTS COM CACHE REDIS - WeaveCode
-# Este script testa especificamente os endpoints com cache implementado
+# ENDPOINTS TEST WITH REDIS CACHE - WeaveCode
+# This script specifically tests endpoints with implemented cache
 
-Write-Host "🧪 TESTE ENDPOINTS COM CACHE REDIS" -ForegroundColor Green
+Write-Host "ENDPOINTS TEST WITH REDIS CACHE" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Cyan
 
 $baseUrl = "https://weavecoderailway-production.up.railway.app"
 
-# 1. TESTAR HEALTH CHECK COM REDIS
-Write-Host "🔧 Testando Health Check com Redis..." -ForegroundColor Yellow
+# 1. TEST HEALTH CHECK WITH REDIS
+Write-Host "Testing Health Check with Redis..." -ForegroundColor Yellow
 try {
     $response = Invoke-WebRequest -Uri "$baseUrl/api/health" -Method GET
     if ($response.StatusCode -eq 200) {
-        Write-Host "✅ Health Check funcionando!" -ForegroundColor Green
+        Write-Host "Health Check working!" -ForegroundColor Green
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
         
-        # Verificar se Redis está incluído na resposta
+        # Check if Redis is included in response
         if ($response.Content -like "*redis*") {
-            Write-Host "✅ Redis detectado na resposta!" -ForegroundColor Green
+            Write-Host "Redis detected in response!" -ForegroundColor Green
         } else {
-            Write-Host "⚠️ Redis não detectado na resposta" -ForegroundColor Yellow
+            Write-Host "Redis not detected in response" -ForegroundColor Yellow
         }
         
         Write-Host "   Response: $($response.Content)" -ForegroundColor Gray
     } else {
-        Write-Host "❌ Health Check falhou!" -ForegroundColor Red
+        Write-Host "Health Check failed!" -ForegroundColor Red
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "❌ Erro ao testar Health Check: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Error testing Health Check: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 2. TESTAR ENDPOINT CUSTOMERS (COM CACHE)
-Write-Host "👥 Testando endpoint /api/customers com cache..." -ForegroundColor Yellow
+# 2. TEST CUSTOMERS ENDPOINT (WITH CACHE)
+Write-Host "Testing endpoint /api/customers with cache..." -ForegroundColor Yellow
 
-# Primeira chamada (deve ir para o banco)
-Write-Host "   📊 Primeira chamada (deve ir para PostgreSQL)..." -ForegroundColor Gray
+# First call (should go to database)
+Write-Host "   First call (should go to PostgreSQL)..." -ForegroundColor Gray
 try {
     $startTime = Get-Date
     $response = Invoke-WebRequest -Uri "$baseUrl/api/customers" -Method GET
@@ -44,23 +44,23 @@ try {
     $duration = ($endTime - $startTime).TotalMilliseconds
     
     if ($response.StatusCode -eq 200) {
-        Write-Host "   ✅ Primeira chamada: $([math]::Round($duration, 2))ms" -ForegroundColor Green
+        Write-Host "   First call: $([math]::Round($duration, 2))ms" -ForegroundColor Green
         
-        # Verificar se veio do banco
+        # Check if data came from database
         if ($response.Content -like "*database*") {
-            Write-Host "   🗄️ Dados obtidos do PostgreSQL (esperado)" -ForegroundColor Green
+            Write-Host "   Data obtained from PostgreSQL (expected)" -ForegroundColor Green
         } else {
-            Write-Host "   ⚠️ Fonte dos dados não identificada" -ForegroundColor Yellow
+            Write-Host "   Data source not identified" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "   ❌ Primeira chamada falhou: $($response.StatusCode)" -ForegroundColor Red
+        Write-Host "   First call failed: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "   ❌ Erro na primeira chamada: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   Error in first call: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Segunda chamada (deve vir do cache)
-Write-Host "   📦 Segunda chamada (deve vir do Redis)..." -ForegroundColor Gray
+# Second call (should come from cache)
+Write-Host "   Second call (should come from Redis)..." -ForegroundColor Gray
 try {
     $startTime = Get-Date
     $response = Invoke-WebRequest -Uri "$baseUrl/api/customers" -Method GET
@@ -68,47 +68,47 @@ try {
     $duration = ($endTime - $startTime).TotalMilliseconds
     
     if ($response.StatusCode -eq 200) {
-        Write-Host "   ✅ Segunda chamada: $([math]::Round($duration, 2))ms" -ForegroundColor Green
+        Write-Host "   Second call: $([math]::Round($duration, 2))ms" -ForegroundColor Green
         
-        # Verificar se veio do cache
+        # Check if data came from cache
         if ($response.Content -like "*cache*") {
-            Write-Host "   📦 Dados obtidos do Redis (esperado)" -ForegroundColor Green
+            Write-Host "   Data obtained from Redis (expected)" -ForegroundColor Green
         } else {
-            Write-Host "   ⚠️ Fonte dos dados não identificada" -ForegroundColor Yellow
+            Write-Host "   Data source not identified" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "   ❌ Segunda chamada falhou: $($response.StatusCode)" -ForegroundColor Red
+        Write-Host "   Second call failed: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "   ❌ Erro na segunda chamada: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   Error in second call: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 3. TESTAR ENDPOINT AUTH (COM CACHE)
-Write-Host "🔐 Testando endpoint /api/auth com cache..." -ForegroundColor Yellow
+# 3. TEST AUTH ENDPOINT (WITH CACHE)
+Write-Host "Testing endpoint /api/auth with cache..." -ForegroundColor Yellow
 
-# Testar endpoint de usuários
-Write-Host "   👤 Testando /api/auth/users..." -ForegroundColor Gray
+# Test users endpoint
+Write-Host "   Testing /api/auth/users..." -ForegroundColor Gray
 try {
     $response = Invoke-WebRequest -Uri "$baseUrl/api/auth/users" -Method GET
     if ($response.StatusCode -eq 200) {
-        Write-Host "   ✅ Endpoint /api/auth/users funcionando!" -ForegroundColor Green
+        Write-Host "   Endpoint /api/auth/users working!" -ForegroundColor Green
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
     } else {
-        Write-Host "   ❌ Endpoint /api/auth/users falhou: $($response.StatusCode)" -ForegroundColor Red
+        Write-Host "   Endpoint /api/auth/users failed: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "   ❌ Erro no endpoint /api/auth/users: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   Error in endpoint /api/auth/users: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 4. TESTAR ENDPOINT STATS (COM CACHE)
-Write-Host "📊 Testando endpoint /api/customers/stats com cache..." -ForegroundColor Yellow
+# 4. TEST STATS ENDPOINT (WITH CACHE)
+Write-Host "Testing endpoint /api/customers/stats with cache..." -ForegroundColor Yellow
 
-# Primeira chamada (deve ir para o banco)
-Write-Host "   📊 Primeira chamada stats (deve ir para PostgreSQL)..." -ForegroundColor Gray
+# First call (should go to database)
+Write-Host "   First call stats (should go to PostgreSQL)..." -ForegroundColor Gray
 try {
     $startTime = Get-Date
     $response = Invoke-WebRequest -Uri "$baseUrl/api/customers/stats" -Method GET
@@ -116,23 +116,23 @@ try {
     $duration = ($endTime - $startTime).TotalMilliseconds
     
     if ($response.StatusCode -eq 200) {
-        Write-Host "   ✅ Primeira chamada stats: $([math]::Round($duration, 2))ms" -ForegroundColor Green
+        Write-Host "   First call stats: $([math]::Round($duration, 2))ms" -ForegroundColor Green
         
-        # Verificar se veio do banco
+        # Check if data came from database
         if ($response.Content -like "*database*") {
-            Write-Host "   🗄️ Stats calculados do PostgreSQL (esperado)" -ForegroundColor Green
+            Write-Host "   Stats calculated from PostgreSQL (expected)" -ForegroundColor Green
         } else {
-            Write-Host "   ⚠️ Fonte dos stats não identificada" -ForegroundColor Yellow
+            Write-Host "   Stats source not identified" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "   ❌ Primeira chamada stats falhou: $($response.StatusCode)" -ForegroundColor Red
+        Write-Host "   First call stats failed: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "   ❌ Erro na primeira chamada stats: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   Error in first call stats: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Segunda chamada (deve vir do cache)
-Write-Host "   📦 Segunda chamada stats (deve vir do Redis)..." -ForegroundColor Gray
+# Second call (should come from cache)
+Write-Host "   Second call stats (should come from Redis)..." -ForegroundColor Gray
 try {
     $startTime = Get-Date
     $response = Invoke-WebRequest -Uri "$baseUrl/api/customers/stats" -Method GET
@@ -140,28 +140,28 @@ try {
     $duration = ($endTime - $startTime).TotalMilliseconds
     
     if ($response.StatusCode -eq 200) {
-        Write-Host "   ✅ Segunda chamada stats: $([math]::Round($duration, 2))ms" -ForegroundColor Green
+        Write-Host "   Second call stats: $([math]::Round($duration, 2))ms" -ForegroundColor Green
         
-        # Verificar se veio do cache
+        # Check if data came from cache
         if ($response.Content -like "*cache*") {
-            Write-Host "   📦 Stats obtidos do Redis (esperado)" -ForegroundColor Green
+            Write-Host "   Stats obtained from Redis (expected)" -ForegroundColor Green
         } else {
-            Write-Host "   ⚠️ Fonte dos stats não identificada" -ForegroundColor Yellow
+            Write-Host "   Stats source not identified" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "   ❌ Segunda chamada stats falhou: $($response.StatusCode)" -ForegroundColor Red
+        Write-Host "   Second call stats failed: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "   ❌ Erro na segunda chamada stats: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "   Error in second call stats: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 5. TESTE DE PERFORMANCE COMPARATIVO
-Write-Host "⚡ Teste de Performance Comparativo..." -ForegroundColor Yellow
+# 5. TEST PERFORMANCE COMPARATIVE
+Write-Host "Testing Comparative Performance..." -ForegroundColor Yellow
 
-# Testar performance com cache
-Write-Host "   📊 Testando performance com cache..." -ForegroundColor Gray
+# Test performance with cache
+Write-Host "   Testing performance with cache..." -ForegroundColor Gray
 $totalTime = 0
 $iterations = 5
 
@@ -173,35 +173,35 @@ for ($i = 1; $i -le $iterations; $i++) {
         $duration = ($endTime - $startTime).TotalMilliseconds
         $totalTime += $duration
         
-        Write-Host "   Iteração $i`: $([math]::Round($duration, 2))ms" -ForegroundColor Gray
+        Write-Host "   Iteration $i`: $([math]::Round($duration, 2))ms" -ForegroundColor Gray
     } catch {
-        Write-Host "   Iteração $i`: Erro" -ForegroundColor Red
+        Write-Host "   Iteration $i`: Error" -ForegroundColor Red
     }
 }
 
 $averageTime = $totalTime / $iterations
-Write-Host "   📊 Tempo médio: $([math]::Round($averageTime, 2))ms" -ForegroundColor Green
+Write-Host "   Average time: $([math]::Round($averageTime, 2))ms" -ForegroundColor Green
 
 if ($averageTime -lt 500) {
-    Write-Host "   🚀 Performance EXCELENTE com cache!" -ForegroundColor Green
+    Write-Host "   Excellent performance with cache!" -ForegroundColor Green
 } elseif ($averageTime -lt 1000) {
-    Write-Host "   ✅ Performance BOA com cache!" -ForegroundColor Green
+    Write-Host "   Good performance with cache!" -ForegroundColor Green
 } else {
-    Write-Host "   ⚠️ Performance pode ser melhorada" -ForegroundColor Yellow
+    Write-Host "   Performance can be improved" -ForegroundColor Yellow
 }
 
 Write-Host ""
 
-# 6. RESUMO FINAL
-Write-Host "📊 RESUMO DOS TESTES DE CACHE:" -ForegroundColor Cyan
+# 6. FINAL SUMMARY
+Write-Host "FINAL CACHE TEST SUMMARY:" -ForegroundColor Cyan
 Write-Host "===============================" -ForegroundColor Cyan
-Write-Host "✅ Health Check: Redis conectado" -ForegroundColor Green
-Write-Host "✅ Endpoint Customers: Cache implementado" -ForegroundColor Green
-Write-Host "✅ Endpoint Auth: Cache implementado" -ForegroundColor Green
-Write-Host "✅ Endpoint Stats: Cache implementado" -ForegroundColor Green
-Write-Host "✅ Performance: Otimizada com Redis" -ForegroundColor Green
-Write-Host "✅ Cache Strategy: Implementada corretamente" -ForegroundColor Green
+Write-Host "Health Check: Redis connected" -ForegroundColor Green
+Write-Host "Customers Endpoint: Cache implemented" -ForegroundColor Green
+Write-Host "Auth Endpoint: Cache implemented" -ForegroundColor Green
+Write-Host "Stats Endpoint: Cache implemented" -ForegroundColor Green
+Write-Host "Performance: Optimized with Redis" -ForegroundColor Green
+Write-Host "Cache Strategy: Implemented correctly" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "🎉 PARABÉNS! CACHE REDIS IMPLEMENTADO COM SUCESSO!" -ForegroundColor Green
-Write-Host "🚀 WeaveCode agora tem performance otimizada!" -ForegroundColor Green
+Write-Host "CONGRATULATIONS! REDIS CACHE IMPLEMENTED SUCCESSFULLY!" -ForegroundColor Green
+Write-Host "WeaveCode now has optimized performance!" -ForegroundColor Green

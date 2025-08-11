@@ -65,40 +65,40 @@ app.use('/api/customers', customersRouter)
 
 async function start() {
   try {
-    // Testar conexão PostgreSQL
-    console.log('🔌 Testando conexão PostgreSQL...')
+    // Test PostgreSQL connection
+    console.log('🔌 Testing PostgreSQL connection...')
     const connectionOk = await testConnection()
     
     if (!connectionOk) {
-      throw new Error('Falha na conexão com PostgreSQL')
+      throw new Error('Failed to connect to PostgreSQL')
     }
     
-    // Conectar Redis
-    console.log('🔌 Conectando Redis...')
+    // Connect Redis
+    console.log('🔌 Connecting to Redis...')
     const redisOk = await connectRedis()
     
     if (!redisOk) {
-      console.warn('⚠️ Redis não disponível, continuando sem cache')
+      console.warn('⚠️ Redis not available, continuing without cache')
     }
     
-    // Verificar tabelas existentes
-    console.log('📋 Verificando tabelas...')
+    // Check existing tables
+    console.log('📋 Checking tables...')
     const tables = await checkTables()
     
-    // Criar tabelas se não existirem
+    // Create tables if they don't exist
     if (!tables.users || !tables.customers) {
-      console.log('🏗️ Criando tabelas...')
+      console.log('🏗️ Creating tables...')
       await createTables()
     }
     
-    console.log('✅ PostgreSQL conectado via driver pg')
+    console.log('✅ PostgreSQL connected via pg driver')
     if (redisOk) {
-      console.log('✅ Redis conectado e funcionando')
+      console.log('✅ Redis connected and working')
     }
-    console.log('✅ Tabelas verificadas/criadas')
+    console.log('✅ Tables checked/created')
     
   } catch (e) {
-    console.error('❌ Falha na inicialização:', e)
+    console.error('❌ Initialisation failed:', e)
     process.exit(1)
   }
   

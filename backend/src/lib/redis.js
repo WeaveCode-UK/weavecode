@@ -1,6 +1,6 @@
 import { createClient } from 'redis'
 
-// Configuração do Redis
+// Redis configuration
 const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://redis.railway.internal:6379',
   socket: {
@@ -9,47 +9,47 @@ const redisClient = createClient({
   }
 })
 
-// Eventos de conexão
+// Connection events
 redisClient.on('connect', () => {
-  console.log('✅ Redis conectado com sucesso')
+  console.log('✅ Redis connected successfully')
 })
 
 redisClient.on('error', (err) => {
-  console.error('❌ Erro Redis:', err)
+  console.error('❌ Redis error:', err)
 })
 
 redisClient.on('ready', () => {
-  console.log('🚀 Redis pronto para uso')
+  console.log('🚀 Redis ready for use')
 })
 
-// Função para conectar
+// Function to connect
 export async function connectRedis() {
   try {
     await redisClient.connect()
     return true
   } catch (error) {
-    console.error('❌ Falha ao conectar Redis:', error)
+    console.error('❌ Failed to connect to Redis:', error)
     return false
   }
 }
 
-// Função para desconectar
+// Function to disconnect
 export async function disconnectRedis() {
   try {
     await redisClient.quit()
-    console.log('👋 Redis desconectado')
+    console.log('👋 Redis disconnected')
   } catch (error) {
-    console.error('❌ Erro ao desconectar Redis:', error)
+    console.error('❌ Error disconnecting from Redis:', error)
   }
 }
 
-// Funções de cache
+// Cache functions
 export async function setCache(key, value, ttl = 300) {
   try {
     await redisClient.setEx(key, ttl, JSON.stringify(value))
     return true
   } catch (error) {
-    console.error('❌ Erro ao definir cache:', error)
+    console.error('❌ Error setting cache:', error)
     return false
   }
 }
@@ -59,7 +59,7 @@ export async function getCache(key) {
     const value = await redisClient.get(key)
     return value ? JSON.parse(value) : null
   } catch (error) {
-    console.error('❌ Erro ao obter cache:', error)
+    console.error('❌ Error getting cache:', error)
     return null
   }
 }
@@ -69,7 +69,7 @@ export async function deleteCache(key) {
     await redisClient.del(key)
     return true
   } catch (error) {
-    console.error('❌ Erro ao deletar cache:', error)
+    console.error('❌ Error deleting cache:', error)
     return false
   }
 }
@@ -77,22 +77,22 @@ export async function deleteCache(key) {
 export async function clearCache() {
   try {
     await redisClient.flushDb()
-    console.log('🧹 Cache limpo com sucesso')
+    console.log('🧹 Cache cleared successfully')
     return true
   } catch (error) {
-    console.error('❌ Erro ao limpar cache:', error)
+    console.error('❌ Error clearing cache:', error)
     return false
   }
 }
 
-// Função para testar conexão
+// Function to test connection
 export async function testRedisConnection() {
   try {
     await redisClient.ping()
     console.log('🏓 Redis PING: PONG')
     return true
   } catch (error) {
-    console.error('❌ Redis PING falhou:', error)
+    console.error('❌ Redis PING failed:', error)
     return false
   }
 }

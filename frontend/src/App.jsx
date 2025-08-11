@@ -9,10 +9,10 @@ function Home() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <h1 className="text-3xl font-semibold">WeaveCode</h1>
-      <p className="mt-2 text-gray-600">Construímos experiências web modernas.</p>
+      <p className="mt-2 text-gray-600">We build modern web experiences.</p>
       <div className="mt-6 flex gap-3">
-        <Link className="px-4 py-2 rounded bg-primary text-white" to="/pricing">Ver Preços</Link>
-        <Link className="px-4 py-2 rounded border" to="/about">Sobre</Link>
+        <Link className="px-4 py-2 rounded bg-primary text-white" to="/pricing">View Prices</Link>
+        <Link className="px-4 py-2 rounded border" to="/about">About</Link>
       </div>
     </div>
   )
@@ -22,12 +22,12 @@ function Pricing() {
   const pricing = {
     currency_symbol: '£',
     website_build: {
-      label: 'Website (com manutenção / apenas site)',
+      label: 'Website (with maintenance / site only)',
       plans: [
         { slug: 'essential', name: 'Essential', with_maintenance: 399, site_only: 639 },
         { slug: 'business', name: 'Business', with_maintenance: 549, site_only: 789 },
         { slug: 'ecommerce', name: 'E-commerce', with_maintenance: 1999, site_only: 2399 },
-        { slug: 'bespoke', name: 'Bespoke', with_maintenance: null, site_only: null, note: 'Sob orçamento' }
+        { slug: 'bespoke', name: 'Bespoke', with_maintenance: null, site_only: null, note: 'On quote' }
       ]
     },
     recurring: [
@@ -39,24 +39,24 @@ function Pricing() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-2xl font-semibold">Preços</h1>
+      <h1 className="text-2xl font-semibold">Prices</h1>
       <section className="mt-6">
-        <h2 className="text-lg font-medium">Website (com manutenção / apenas site)</h2>
+        <h2 className="text-lg font-medium">Website (with maintenance / site only)</h2>
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-left border-separate border-spacing-y-2">
             <thead className="text-sm text-gray-500">
               <tr>
                 <th className="py-2">Plano</th>
-                <th className="py-2">Com manutenção</th>
-                <th className="py-2">Apenas site</th>
+                <th className="py-2">With maintenance</th>
+                <th className="py-2">Site only</th>
               </tr>
             </thead>
             <tbody>
               {pricing.website_build.plans.map((p) => (
                 <tr key={p.slug} className="bg-white">
                   <td className="py-3 font-medium">{p.name}</td>
-                  <td className="py-3">{p.with_maintenance != null ? `${pricing.currency_symbol}${p.with_maintenance.toLocaleString('en-GB')}` : p.note ?? 'Sob orçamento'}</td>
-                  <td className="py-3">{p.site_only != null ? `${pricing.currency_symbol}${p.site_only.toLocaleString('en-GB')}` : p.note ?? 'Sob orçamento'}</td>
+                  <td className="py-3">{p.with_maintenance != null ? `${pricing.currency_symbol}${p.with_maintenance.toLocaleString('en-GB')}` : p.note ?? 'On quote'}</td>
+                  <td className="py-3">{p.site_only != null ? `${pricing.currency_symbol}${p.site_only.toLocaleString('en-GB')}` : p.note ?? 'On quote'}</td>
                 </tr>
               ))}
             </tbody>
@@ -94,8 +94,8 @@ function Pricing() {
 function About() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-2xl font-semibold">Sobre</h1>
-      <p className="mt-2 text-gray-600">Somos uma empresa focada em soluções web modernas.</p>
+      <h1 className="text-2xl font-semibold">About</h1>
+      <p className="mt-2 text-gray-600">We are a company focused on modern web solutions.</p>
     </div>
   )
 }
@@ -125,13 +125,13 @@ export default function App() {
           <Link to="/" className="font-semibold">WeaveCode</Link>
           <nav className="flex gap-4 text-sm text-gray-600">
             <Link to="/">Home</Link>
-            <Link to="/pricing">Preços</Link>
-            <Link to="/customers">Clientes</Link>
-            <Link to="/about">Sobre</Link>
+            <Link to="/pricing">Prices</Link>
+            <Link to="/customers">Customers</Link>
+            <Link to="/about">About</Link>
             <Link to="/checkout">Checkout</Link>
-            <Link to="/contact">Contato</Link>
+            <Link to="/contact">Contact</Link>
             {user ? <LogoutButton /> : <>
-              <Link to="/login">Entrar</Link>
+              <Link to="/login">Sign In</Link>
               <Link to="/register">Registrar</Link>
             </>}
           </nav>
@@ -163,18 +163,18 @@ function Login({ onLogin }) {
       const res = await AuthAPI.login(email, password)
       onLogin(res.token)
     } catch (e) {
-      setError('Falha no login')
+      setError('Login failed')
     }
   }
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
-      <h1 className="text-2xl font-semibold mb-4">Entrar</h1>
+      <h1 className="text-2xl font-semibold mb-4">Sign In</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input className="w-full border px-3 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="w-full border px-3 py-2" placeholder="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Entrar</button>
+        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Sign In</button>
       </form>
     </main>
   )
@@ -187,13 +187,13 @@ function Customers() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' })
   const [saving, setSaving] = useState(false)
   useEffect(() => {
-    import('./lib/api').then(({ CustomersAPI }) => CustomersAPI.list().then(setItems).catch(() => setError('Falha ao carregar')).finally(() => setLoading(false)))
+    import('./lib/api').then(({ CustomersAPI }) => CustomersAPI.list().then(setItems).catch(() => setError('Failed to load')).finally(() => setLoading(false)))
   }, [])
-  if (loading) return <div className="p-6">Carregando...</div>
+  if (loading) return <div className="p-6">Loading...</div>
   if (error) return <div className="p-6 text-red-600">{error}</div>
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="text-2xl font-semibold">Clientes</h1>
+      <h1 className="text-2xl font-semibold">Customers</h1>
       <form className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3" onSubmit={async (e) => {
         e.preventDefault()
         setSaving(true)
@@ -203,16 +203,16 @@ function Customers() {
           setItems((prev) => [created, ...prev])
           setForm({ name: '', email: '', phone: '', notes: '' })
         } catch {
-          alert('Falha ao criar cliente')
+          alert('Failed to create customer')
         } finally {
           setSaving(false)
         }
       }}>
-        <input required className="border px-3 py-2" placeholder="Nome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input required className="border px-3 py-2" placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         <input required className="border px-3 py-2" placeholder="Email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input className="border px-3 py-2" placeholder="Telefone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-        <input className="border px-3 py-2 sm:col-span-2" placeholder="Notas" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-        <button disabled={saving} className="px-4 py-2 rounded bg-primary text-white sm:col-span-2" type="submit">{saving ? 'Salvando...' : 'Adicionar cliente'}</button>
+        <input className="border px-3 py-2" placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+        <input className="border px-3 py-2 sm:col-span-2" placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+        <button disabled={saving} className="px-4 py-2 rounded bg-primary text-white sm:col-span-2" type="submit">{saving ? 'Saving...' : 'Add customer'}</button>
       </form>
       <ul className="mt-4 divide-y">
         {items.map((c) => (
@@ -241,20 +241,20 @@ function Register({ onRegistered }) {
       setOk(true)
       onRegistered?.()
     } catch (e) {
-      setError('Falha no registro')
+      setError('Registration failed')
     }
   }
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
-      <h1 className="text-2xl font-semibold mb-4">Registrar</h1>
+      <h1 className="text-2xl font-semibold mb-4">Register</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input className="w-full border px-3 py-2" placeholder="Nome" value={name} onChange={(e) => setName(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <input className="w-full border px-3 py-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input className="w-full border px-3 py-2" placeholder="Senha" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        <input className="w-full border px-3 py-2" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {error && <p className="text-red-600 text-sm">{error}</p>}
-        {ok && <p className="text-green-700 text-sm">Registrado com sucesso. Faça login.</p>}
-        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Registrar</button>
+        {ok && <p className="text-green-700 text-sm">Registered successfully. Please sign in.</p>}
+        <button className="px-4 py-2 rounded bg-primary text-white" type="submit">Register</button>
       </form>
     </main>
   )

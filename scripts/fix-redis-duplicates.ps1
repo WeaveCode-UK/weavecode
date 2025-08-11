@@ -1,27 +1,25 @@
-# 🔧 FIX REDIS DUPLICATES - WeaveCode
-# Este script resolve o problema dos Redis duplicados
+# Fix Redis Duplicates - WeaveCode
+# This script fixes duplicate entries in Redis cache
 
-Write-Host "🔧 RESOLVENDO REDIS DUPLICADOS..." -ForegroundColor Yellow
-Write-Host "=====================================" -ForegroundColor Cyan
+Write-Host "FIXING REDIS DUPLICATES" -ForegroundColor Green
+Write-Host "=============================" -ForegroundColor Cyan
 
-# 1. VERIFICAR SERVIÇOS ATUAIS
-Write-Host "📊 Verificando serviços atuais..." -ForegroundColor Yellow
+# Check current services
+Write-Host "Checking current services..." -ForegroundColor Yellow
 railway status
 
-# 2. IDENTIFICAR REDIS DUPLICADOS
-Write-Host "🔍 Identificando Redis duplicados..." -ForegroundColor Yellow
-Write-Host "Deve haver apenas 1 Redis para todo o projeto" -ForegroundColor Red
+# 2. IDENTIFY REDIS DUPLICATES
+Write-Host "Identifying Redis duplicates..." -ForegroundColor Yellow
+Write-Host "There should only be 1 Redis for the entire project" -ForegroundColor Red
 
-# 3. MANTER APENAS O REDIS MAIS ANTIGO
-Write-Host "✅ Mantendo apenas o Redis mais antigo..." -ForegroundColor Green
-Write-Host "Removendo Redis-AWVN (mais recente)" -ForegroundColor Yellow
+# 3. KEEP ONLY THE OLDEST REDIS
+Write-Host "Keeping only the oldest Redis..." -ForegroundColor Green
+Write-Host "Removing Redis-AWVN (most recent)" -ForegroundColor Yellow
 
-# 4. CONFIGURAR VARIÁVEIS NO REDIS RESTANTE
-Write-Host "⚙️ Configurando variáveis no Redis restante..." -ForegroundColor Yellow
+# 4. CONFIGURE VARIABLES IN REMAINING REDIS
+Write-Host "Configuring variables in remaining Redis..." -ForegroundColor Yellow
 railway variables --service redis --set "REDIS_URL=redis://redis.railway.internal:6379"
 
-# 5. VERIFICAR STATUS FINAL
-Write-Host "✅ REDIS DUPLICADOS RESOLVIDOS!" -ForegroundColor Green
+# 5. CHECK FINAL STATUS
+Write-Host "REDIS DUPLICATES RESOLVED!" -ForegroundColor Green
 railway status
-
-Write-Host "🎉 PROBLEMA RESOLVIDO!" -ForegroundColor Green

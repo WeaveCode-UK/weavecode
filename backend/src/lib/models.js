@@ -86,7 +86,7 @@ export class Customer {
   }
 }
 
-// Função para criar tabelas (migração)
+// Function to create tables (migration)
 export async function createTables() {
   try {
     // Tabela users
@@ -115,7 +115,7 @@ export async function createTables() {
       )
     `)
 
-    console.log('✅ Tabelas criadas com sucesso')
+    console.log('✅ Tables created successfully')
     return true
   } catch (error) {
     console.error('❌ Erro ao criar tabelas:', error)
@@ -123,7 +123,7 @@ export async function createTables() {
   }
 }
 
-// Função para verificar se as tabelas existem
+// Function to check if tables exist
 export async function checkTables() {
   try {
     const result = await query(`
@@ -141,7 +141,7 @@ export async function checkTables() {
       customers: existingTables.includes('customers')
     }
   } catch (error) {
-    console.error('❌ Erro ao verificar tabelas:', error)
+    console.error('❌ Error checking tables:', error)
     return { users: false, customers: false }
   }
 }

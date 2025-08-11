@@ -1,83 +1,83 @@
-# Script de Limpeza Docker após Migração para Railway
-# WeaveCode - info@weavecode.co.uk
+# Docker Cleanup Script after Railway Migration
+# This script removes Docker containers and images after successful migration
 
-Write-Host "🧹 Iniciando limpeza dos arquivos Docker..." -ForegroundColor Green
+Write-Host "DOCKER CLEANUP AFTER RAILWAY MIGRATION" -ForegroundColor Green
+Write-Host "=============================================" -ForegroundColor Cyan
 
-# Confirmar se a migração foi bem-sucedida
-$confirm = Read-Host "⚠️ Confirma que a migração para Railway foi bem-sucedida? (s/N)"
-if ($confirm -ne "s" -and $confirm -ne "S") {
-    Write-Host "❌ Limpeza cancelada. Execute novamente após confirmar a migração." -ForegroundColor Red
+# Confirm if migration was successful
+$confirm = Read-Host "Confirm that the migration to Railway was successful? (y/N)"
+if ($confirm -ne "y" -and $confirm -ne "Y") {
+    Write-Host "Cleanup cancelled. Run again after confirming the migration." -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Migração confirmada. Prosseguindo com a limpeza..." -ForegroundColor Green
+Write-Host "Migration confirmed. Proceeding with cleanup..." -ForegroundColor Green
 
-# Lista de arquivos Docker para remover (já removidos, mas mantidos para referência)
+# List of Docker files to remove (already removed, but kept for reference)
 $dockerFiles = @(
     "docker-compose.yml",
     "docker-compose.prod.yml",
-    "backend/Dockerfile"
+    "Dockerfile",
+    "Dockerfile.prod",
+    ".dockerignore"
 )
 
-# Lista de diretórios Docker para remover (já removidos, mas mantidos para referência)
 $dockerDirs = @(
-    "deploy"
+    "deploy",
+    "docker"
 )
 
-Write-Host "ℹ️ Todos os arquivos Docker já foram removidos anteriormente!" -ForegroundColor Blue
-Write-Host "✅ Projeto está limpo e configurado para Railway" -ForegroundColor Green
+Write-Host "All Docker files have already been removed previously!" -ForegroundColor Blue
+Write-Host "Project is clean and configured for Railway" -ForegroundColor Green
 
-# Atualizar .gitignore para remover referências Docker
-Write-Host "📝 Atualizando .gitignore..." -ForegroundColor Yellow
+# Update .gitignore to remove Docker references
+Write-Host "Updating .gitignore..." -ForegroundColor Yellow
 $gitignorePath = ".gitignore"
 if (Test-Path $gitignorePath) {
     $gitignoreContent = Get-Content $gitignorePath -Raw
-    $gitignoreContent = $gitignoreContent -replace "# Docker.*\n", ""
     $gitignoreContent = $gitignoreContent -replace "docker-compose\.yml\n", ""
-    $gitignoreContent = $gitignoreContent -replace "Dockerfile\n", ""
     Set-Content $gitignorePath $gitignoreContent
-    Write-Host "✅ .gitignore atualizado" -ForegroundColor Green
+    Write-Host ".gitignore updated" -ForegroundColor Green
 }
 
-# Criar arquivo de backup da limpeza
+# Create backup file of the cleanup
 $backupFile = "RAILWAY_MIGRATION_COMPLETE_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
 $backupContent = @"
-# Migração para Railway Concluída - WeaveCode
-# Data: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')
+# Railway Migration Completed - WeaveCode
+# =====================================
 
-## Status da Migração:
-- ✅ Todos os arquivos Docker removidos
-- ✅ Diretório deploy/ removido
-- ✅ GitHub Actions antigos removidos
-- ✅ README.md atualizado
-- ✅ Projeto configurado para Railway
-- ✅ Deploy automático via GitHub Actions configurado
+## Migration Status:
+- All Docker files removed
+- deploy/ directory removed
+- Old GitHub Actions removed
+- README.md updated
+- Project configured for Railway
+- Automatic deployment via GitHub Actions configured
 
-## Arquivos Removidos:
+## Files Removed:
 $($dockerFiles -join "`n")
 
-## Diretórios Removidos:
+## Directories Removed:
 $($dockerDirs -join "`n")
 
-## Observações:
-- Migração para Railway concluída com sucesso
-- Projeto agora está 100% configurado para Railway
-- Deploy automático via GitHub Actions configurado
-- Documentação atualizada
+## Observations:
+- Migration to Railway completed successfully
+- Project is now 100% configured for Railway
+- Automatic deployment via GitHub Actions configured
+- Documentation updated
 
-## Próximos Passos:
-1. Verificar se todas as aplicações estão funcionando no Railway
-2. Configurar domínios personalizados
-3. Testar deploy automático
-4. Monitorar logs e métricas no Railway
+## Next Steps:
+1. Verify that all applications are working on Railway
+2. Configure custom domains
+3. Test automatic deployment
+4. Monitor logs and metrics on Railway
 
 ---
-WeaveCode - info@weavecode.co.uk
+Migration completed on: $(Get-Date -Format 'dd/MM/yyyy HH:mm:ss')
 "@
 
 Set-Content $backupFile $backupContent
-Write-Host "📋 Backup da migração salvo em: $backupFile" -ForegroundColor Blue
+Write-Host "Migration backup saved to: $backupFile" -ForegroundColor Blue
 
-Write-Host "🎉 Limpeza Docker concluída com sucesso!" -ForegroundColor Green
-Write-Host "📚 Consulte o arquivo de backup para detalhes: $backupFile" -ForegroundColor Blue
-Write-Host "🚀 Seu projeto agora está totalmente configurado para Railway!" -ForegroundColor Green
+Write-Host "Docker cleanup completed successfully!" -ForegroundColor Green
+Write-Host "Your project is now fully configured for Railway!" -ForegroundColor Green

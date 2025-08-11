@@ -1,117 +1,119 @@
-# 🧪 TESTE REDIS CACHE - WeaveCode
-# Este script testa especificamente as funcionalidades Redis
+# SPECIFIC REDIS CACHE TEST - WeaveCode
+# This script specifically tests Redis functionality
 
-Write-Host "🧪 TESTE ESPECÍFICO REDIS CACHE" -ForegroundColor Green
+Write-Host "SPECIFIC REDIS CACHE TEST" -ForegroundColor Green
 Write-Host "===================================" -ForegroundColor Cyan
 
-# 1. TESTAR HEALTH CHECK COMPLETO
-Write-Host "🔧 Testando Health Check com Redis..." -ForegroundColor Yellow
+# 1. TEST COMPLETE HEALTH CHECK
+Write-Host "Testing Health Check with Redis..." -ForegroundColor Yellow
 $healthUrl = "https://weavecoderailway-production.up.railway.app/api/health"
 try {
     $response = Invoke-WebRequest -Uri $healthUrl -Method GET
     if ($response.StatusCode -eq 200) {
-        Write-Host "✅ Health Check funcionando!" -ForegroundColor Green
+        Write-Host "Health Check working!" -ForegroundColor Green
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
         Write-Host "   Response: $($response.Content)" -ForegroundColor Gray
         
-        # Verificar se Redis está incluído na resposta
+        # Check if Redis is included in response
         if ($response.Content -like "*redis*") {
-            Write-Host "✅ Redis detectado na resposta!" -ForegroundColor Green
+            Write-Host "Redis detected in response!" -ForegroundColor Green
         } else {
-            Write-Host "⚠️ Redis não detectado na resposta" -ForegroundColor Yellow
+            Write-Host "Redis not detected in response" -ForegroundColor Yellow
         }
+        
+        Write-Host "   Response: $($response.Content)" -ForegroundColor Gray
     } else {
-        Write-Host "❌ Health Check falhou!" -ForegroundColor Red
+        Write-Host "Health Check failed!" -ForegroundColor Red
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "❌ Erro ao testar Health Check: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Error testing Health Check: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 2. TESTAR ENDPOINTS DA API
-Write-Host "🌐 Testando endpoints da API..." -ForegroundColor Yellow
+# 2. TEST API ENDPOINTS
+Write-Host "Testing API endpoints..." -ForegroundColor Yellow
 
-# Testar endpoint de customers
+# Test customers endpoint
 $customersUrl = "https://weavecoderailway-production.up.railway.app/api/customers"
 try {
     $response = Invoke-WebRequest -Uri $customersUrl -Method GET
-    Write-Host "✅ Endpoint /api/customers funcionando!" -ForegroundColor Green
+    Write-Host "Endpoint /api/customers working!" -ForegroundColor Green
     Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
 } catch {
-    Write-Host "❌ Endpoint /api/customers falhou: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Endpoint /api/customers failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-# Testar endpoint de auth
+# Test auth endpoint
 $authUrl = "https://weavecoderailway-production.up.railway.app/api/auth"
 try {
     $response = Invoke-WebRequest -Uri $authUrl -Method GET
-    Write-Host "✅ Endpoint /api/auth funcionando!" -ForegroundColor Green
+    Write-Host "Endpoint /api/auth working!" -ForegroundColor Green
     Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
 } catch {
-    Write-Host "❌ Endpoint /api/auth falhou: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Endpoint /api/auth failed: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 3. TESTAR FRONTEND
-Write-Host "🌐 Testando Frontend..." -ForegroundColor Yellow
+# 3. TEST FRONTEND
+Write-Host "Testing Frontend..." -ForegroundColor Yellow
 $frontendUrl = "https://frontendweavecode-production.up.railway.app"
 try {
     $response = Invoke-WebRequest -Uri $frontendUrl -Method GET
     if ($response.StatusCode -eq 200) {
-        Write-Host "✅ Frontend funcionando!" -ForegroundColor Green
+        Write-Host "Frontend working!" -ForegroundColor Green
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor White
         Write-Host "   Content-Type: $($response.Headers.'Content-Type')" -ForegroundColor Gray
         
-        # Verificar se é uma página React
+        # Check if it's a React page
         if ($response.Content -like "*react*" -or $response.Content -like "*React*") {
-            Write-Host "✅ Página React detectada!" -ForegroundColor Green
+            Write-Host "React page detected!" -ForegroundColor Green
         } else {
-            Write-Host "⚠️ Página React não detectada" -ForegroundColor Yellow
+            Write-Host "React page not detected" -ForegroundColor Yellow
         }
     } else {
-        Write-Host "❌ Frontend com problema!" -ForegroundColor Red
+        Write-Host "Frontend has issues!" -ForegroundColor Red
         Write-Host "   Status: $($response.StatusCode)" -ForegroundColor Red
     }
 } catch {
-    Write-Host "❌ Erro ao testar Frontend: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Error testing Frontend: $($_.Exception.Message)" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 4. TESTE DE PERFORMANCE
-Write-Host "⚡ Teste de Performance..." -ForegroundColor Yellow
+# 4. PERFORMANCE TEST
+Write-Host "Performance Test..." -ForegroundColor Yellow
 $startTime = Get-Date
 try {
     $response = Invoke-WebRequest -Uri $healthUrl -Method GET
     $endTime = Get-Date
     $duration = ($endTime - $startTime).TotalMilliseconds
-    Write-Host "✅ Health Check em $([math]::Round($duration, 2))ms" -ForegroundColor Green
+    Write-Host "Health Check in $([math]::Round($duration, 2))ms" -ForegroundColor Green
     
     if ($duration -lt 1000) {
-        Write-Host "🚀 Performance EXCELENTE!" -ForegroundColor Green
+        Write-Host "EXCELLENT performance!" -ForegroundColor Green
     } elseif ($duration -lt 3000) {
-        Write-Host "✅ Performance BOA!" -ForegroundColor Green
+        Write-Host "GOOD performance!" -ForegroundColor Green
     } else {
-        Write-Host "⚠️ Performance pode ser melhorada" -ForegroundColor Yellow
+        Write-Host "Performance could be improved" -ForegroundColor Yellow
     }
 } catch {
-    Write-Host "❌ Erro no teste de performance" -ForegroundColor Red
+    Write-Host "Error in performance test" -ForegroundColor Red
 }
 
 Write-Host ""
 
-# 5. RESUMO FINAL
-Write-Host "📊 RESUMO DOS TESTES REDIS:" -ForegroundColor Cyan
+# 5. FINAL SUMMARY
+Write-Host "REDIS TESTS SUMMARY:" -ForegroundColor Cyan
 Write-Host "=============================" -ForegroundColor Cyan
-Write-Host "✅ Backend: Railway + PostgreSQL + Redis" -ForegroundColor Green
-Write-Host "✅ Frontend: Railway + React + NIXPACKS" -ForegroundColor Green
-Write-Host "✅ Cache: Redis conectado e funcionando" -ForegroundColor Green
-Write-Host "✅ Infraestrutura: Zero Docker + Zero VPS" -ForegroundColor Green
-Write-Host "✅ Migração: 100% COMPLETA!" -ForegroundColor Green
+Write-Host "Backend: Railway + PostgreSQL + Redis" -ForegroundColor Green
+Write-Host "Frontend: Railway + React + NIXPACKS" -ForegroundColor Green
+Write-Host "Cache: Redis connected and working" -ForegroundColor Green
+Write-Host "Infrastructure: Zero Docker + Zero VPS" -ForegroundColor Green
+Write-Host "Migration: 100% COMPLETE!" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "🎉 PARABÉNS! TODOS OS TESTES PASSARAM!" -ForegroundColor Green
-Write-Host "🚀 WeaveCode está rodando perfeitamente na nuvem!" -ForegroundColor Green
+Write-Host "CONGRATULATIONS! ALL TESTS PASSED!" -ForegroundColor Green
+Write-Host "WeaveCode is running perfectly in the cloud!" -ForegroundColor Green

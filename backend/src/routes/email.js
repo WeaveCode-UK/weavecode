@@ -13,7 +13,7 @@ router.post('/send', async (req, res) => {
       await sgMail.send(msg)
       return res.json({ ok: true })
     }
-    // Sem API key, apenas ecoa (modo dev)
+    // Without API key, just echo (dev mode)
     return res.json({ ok: true, simulated: true, message: msg })
   } catch (e) {
     return res.status(500).json({ error: 'Email error', details: e.message })

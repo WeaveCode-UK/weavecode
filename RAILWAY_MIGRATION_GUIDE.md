@@ -1,109 +1,109 @@
-# 🚀 Guia de Migração para Railway
+# 🚀 Railway Migration Guide
 ## WeaveCode - info@weavecode.co.uk
 
-### 📋 Visão Geral
-Este guia documenta a migração completa do projeto WeaveCode do VPS Docker para Railway, removendo todas as dependências Docker e criando um ambiente moderno e escalável para aplicações SaaS.
+### 📋 Overview
+This guide documents the complete migration of the WeaveCode project from VPS Docker to Railway, removing all Docker dependencies and creating a modern and scalable environment for SaaS applications.
 
-### 🎯 Objetivos da Migração
-1. **Railway (Aplicações SaaS)**
-   - ✅ Chatwoot personalizado (chatbot)
-   - ✅ Sistema de booking
-   - ✅ Dashboard admin
-   - ✅ APIs personalizadas
-   - ✅ Deploy automático via GitHub
+### 🎯 Migration Objectives
+1. **Railway (SaaS Applications)**
+   - ✅ Custom Chatwoot (chatbot)
+   - ✅ Booking system
+   - ✅ Admin dashboard
+   - ✅ Custom APIs
+   - ✅ Automatic deployment via GitHub
 
-2. **SiteGround (Sites tradicionais)**
-   - ✅ Sites WordPress
-   - ✅ Sites institucionais
-   - ✅ E-commerce básico
-   - ✅ Revenda de hosting
+2. **SiteGround (Traditional sites)**
+   - ✅ WordPress sites
+   - ✅ Institutional sites
+   - ✅ Basic e-commerce
+   - ✅ Hosting resale
 
-### 🔄 O que foi Reconfigurado
+### 🔄 What was Reconfigured
 
-#### 1. Backend Node.js
-- ❌ Removidas dependências Docker
-- ✅ Configurado para Railway
-- ✅ Ajustadas variáveis de ambiente
-- ✅ Configurados health checks para Railway
+#### 1. Node.js Backend
+- ❌ Docker dependencies removed
+- ✅ Configured for Railway
+- ✅ Environment variables adjusted
+- ✅ Health checks configured for Railway
 
 #### 2. Database
-- ❌ Removido PostgreSQL local
-- ✅ Configurado PostgreSQL Railway
-- ✅ Ajustado Prisma schema
-- ✅ Scripts de migração criados
+- ❌ Local PostgreSQL removed
+- ✅ Railway PostgreSQL configured
+- ✅ Prisma schema adjusted
+- ✅ Migration scripts created
 
-#### 3. Frontend React
-- ❌ Removido build Docker
-- ✅ Configurado deploy Railway
-- ✅ Ajustadas variáveis de ambiente
-- ✅ Configurados domínios personalizados
+#### 3. React Frontend
+- ❌ Docker build removed
+- ✅ Railway deployment configured
+- ✅ Environment variables adjusted
+- ✅ Custom domains configured
 
 #### 4. Chatwoot
-- ❌ Removida configuração Docker
-- ✅ Configurado Ruby on Rails no Railway
-- ✅ Ajustadas dependências
-- ✅ Configurado Redis Railway
+- ❌ Docker configuration removed
+- ✅ Ruby on Rails configured on Railway
+- ✅ Dependencies adjusted
+- ✅ Railway Redis configured
 
-#### 5. Deploy
-- ❌ Removido Docker Compose
-- ❌ Removido Caddy
-- ✅ Configurado GitHub Actions para Railway
-- ✅ Configurado deploy automático
+#### 5. Deployment
+- ❌ Docker Compose removed
+- ❌ Caddy removed
+- ✅ GitHub Actions configured for Railway
+- ✅ Automatic deployment configured
 
-### 🛠️ Tecnologias da Nova Arquitetura
-- **Railway**: Deploy e hospedagem
-- **PostgreSQL**: Banco de dados
-- **Redis**: Cache e sessões
+### 🛠️ New Architecture Technologies
+- **Railway**: Deployment and hosting
+- **PostgreSQL**: Database
+- **Redis**: Cache and sessions
 - **GitHub Actions**: CI/CD
 - **Prisma**: ORM
 - **Express.js**: Backend API
 - **React**: Frontend
 - **Ruby on Rails**: Chatwoot
 
-### 💰 Custos Estimados
-- **Railway Hobby**: $5 mínimo/mês (desenvolvimento)
-- **Railway Pro**: $20/mês (produção)
-- **SiteGround**: $15-30/mês (revenda)
+### 💰 Estimated Costs
+- **Railway Hobby**: $5 minimum/month (development)
+- **Railway Pro**: $20/month (production)
+- **SiteGround**: $15-30/month (resale)
 
-### 📁 Arquivos Criados/Modificados
+### 📁 Files Created/Modified
 
 #### Backend
-- `railway.json` - Configuração Railway
-- `env.example` - Variáveis de ambiente
-- `package.json` - Scripts atualizados
+- `railway.json` - Railway configuration
+- `env.example` - Environment variables
+- `package.json` - Updated scripts
 
 #### Frontend
-- `railway.json` - Configuração Railway
-- `env.example` - Variáveis de ambiente
-- `vite.config.js` - Configuração produção
+- `railway.json` - Railway configuration
+- `env.example` - Environment variables
+- `vite.config.js` - Production configuration
 
 #### Chatwoot
-- `railway.json` - Configuração Railway
+- `railway.json` - Railway configuration
 
-#### Deploy
+#### Deployment
 - `.github/workflows/deploy-railway.yml` - GitHub Actions
-- `scripts/migrate-to-railway.ps1` - Script PowerShell
+- `scripts/migrate-to-railway.ps1` - PowerShell script
 
-### 🚀 Passos para Migração
+### 🚀 Migration Steps
 
-#### 1. Preparação
+#### 1. Preparation
 ```bash
-# Instalar Railway CLI
+# Install Railway CLI
 npm install -g @railway/cli
 
-# Login no Railway
+# Login to Railway
 railway login
 ```
 
-#### 2. Configurar Projeto
+#### 2. Configure Project
 ```bash
-# Inicializar projeto Railway
+# Initialise Railway project
 railway init
 
-# Configurar variáveis de ambiente
-railway variables set DATABASE_URL="sua-url-postgresql"
-railway variables set JWT_SECRET="seu-jwt-secret"
-railway variables set STRIPE_SECRET_KEY="sua-stripe-key"
+# Configure environment variables
+railway variables set DATABASE_URL="your-postgresql-url"
+railway variables set JWT_SECRET="your-jwt-secret"
+railway variables set STRIPE_SECRET_KEY="your-stripe-key"
 ```
 
 #### 3. Deploy
@@ -121,13 +121,13 @@ cd chatwoot
 railway up
 ```
 
-#### 4. Configurar Domínios
+#### 4. Configure Domains
 ```bash
-# Configurar domínios personalizados
+# Configure custom domains
 railway domain
 ```
 
-### 🔧 Configuração de Variáveis de Ambiente
+### 🔧 Environment Variable Configuration
 
 #### Backend (.env)
 ```env
@@ -153,44 +153,44 @@ VITE_APP_VERSION="1.0.0"
 - **Frontend**: `/`
 - **Chatwoot**: `/health`
 
-### 🔄 Deploy Automático
-O deploy automático está configurado via GitHub Actions:
-- Push para `main` → Deploy automático
-- Pull Request → Execução de testes
-- Deploy separado para backend e frontend
+### 🔄 Automatic Deployment
+Automatic deployment is configured via GitHub Actions:
+- Push to `main` → Automatic deployment
+- Pull Request → Test execution
+- Separate deployment for backend and frontend
 
-### 🧪 Testes
+### 🧪 Tests
 - Backend: `npm test`
 - Frontend: `npm test`
-- Integração: GitHub Actions
+- Integration: GitHub Actions
 
-### 📚 Recursos Adicionais
-- [Documentação Railway](https://docs.railway.app)
+### 📚 Additional Resources
+- [Railway Documentation](https://docs.railway.app)
 - [GitHub Actions](https://docs.github.com/en/actions)
 - [Prisma](https://www.prisma.io/docs)
 - [Vite](https://vitejs.dev/guide/)
 
-### ✅ Checklist de Migração
-- [ ] Instalar Railway CLI
-- [ ] Login no Railway
-- [ ] Criar projeto Railway
-- [ ] Configurar variáveis de ambiente
-- [ ] Deploy do backend
-- [ ] Deploy do frontend
-- [ ] Deploy do Chatwoot
-- [ ] Configurar domínios
-- [ ] Testar aplicação
-- [ ] Configurar GitHub Actions
-- [ ] Remover arquivos Docker antigos
+### ✅ Migration Checklist
+- [ ] Install Railway CLI
+- [ ] Login to Railway
+- [ ] Create Railway project
+- [ ] Configure environment variables
+- [ ] Deploy backend
+- [ ] Deploy frontend
+- [ ] Deploy Chatwoot
+- [ ] Configure domains
+- [ ] Test application
+- [ ] Configure GitHub Actions
+- [ ] Remove old Docker files
 
-### 🆘 Suporte
-Para dúvidas ou problemas durante a migração:
+### 🆘 Support
+For questions or issues during migration:
 - Email: info@weavecode.co.uk
-- Documentação: Este guia
+- Documentation: This guide
 - Railway Docs: https://docs.railway.app
 
 ---
 
-**Data da Migração**: $(Get-Date -Format "dd/MM/yyyy")
-**Versão**: 1.0.0
-**Status**: Em Progresso
+**Migration Date**: $(Get-Date -Format "dd/MM/yyyy")
+**Version**: 1.0.0
+**Status**: In Progress

@@ -6,7 +6,7 @@ import { getCache, setCache, deleteCache } from '../lib/redis.js'
 
 const router = express.Router()
 
-// POST /api/auth/register - Registrar novo usuário
+// POST /api/auth/register - Register new user
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, roles = ['user'] } = req.body
@@ -14,24 +14,24 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Nome, email e senha são obrigatórios'
+        error: 'Name, email and password are required'
       })
     }
     
-    // Verificar se usuário já existe
+    // Check if user already exists
     const existingUser = await User.findByEmail(email)
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: 'Usuário já existe com este email'
+        error: 'User already exists with this email'
       })
     }
     
-    // Hash da senha
+    // Hash password
     const saltRounds = 12
     const passwordHash = await bcrypt.hash(password, saltRounds)
     
-    // Criar usuário
+    // Create user
     const user = await User.create({
       name,
       email,
@@ -39,11 +39,11 @@ router.post('/register', async (req, res) => {
       roles
     })
     
-    // Limpar cache de usuários
+    // Clear user cache
     await deleteCache('users:all')
-    console.log('🧹 Cache de usuários limpo após registro')
+    console.log('🧹 User cache cleared after registration')
     
-    // Gerar JWT
+    // Generate JWT
     const token = jwt.sign(
       { userId: user.id, email: user.email, roles: user.roles },
       process.env.JWT_SECRET,
@@ -61,20 +61,20 @@ router.post('/register', async (req, res) => {
         },
         token
       },
-      message: 'Usuário registrado com sucesso',
+      message: 'User registered successfully',
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    console.error('❌ Erro ao registrar usuário:', error)
+    console.error('❌ Error registering user:', error)
     res.status(500).json({
       success: false,
-      error: 'Erro interno do servidor',
+      error: 'Internal server error',
       message: error.message
     })
   }
 })
 
-// POST /api/auth/login - Login do usuário
+// POST /api/auth/login - User login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
@@ -82,45 +82,45 @@ router.post('/login', async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: 'Email e senha são obrigatórios'
+        error: 'Email and password are required'
       })
     }
     
-    // Buscar usuário
+    // Find user
     const user = await User.findByEmail(email)
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Credenciais inválidas'
+        error: 'Invalid credentials'
       })
     }
     
-    // Verificar senha
+    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password_hash)
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        error: 'Credenciais inválidas'
+        error: 'Invalid credentials'
       })
     }
     
-    // Gerar JWT
+    // Generate JWT
     const token = jwt.sign(
       { userId: user.id, email: user.email, roles: user.roles },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     )
     
-    // Salvar sessão no cache por 24 horas
+    // Save session to cache for 24 hours
     const sessionKey = `session:${user.id}`
     await setCache(sessionKey, {
       userId: user.id,
       email: user.email,
       roles: user.roles,
       lastLogin: new Date().toISOString()
-    }, 86400) // 24 horas
+    }, 86400) // 24 hours
     
-    console.log(`💾 Sessão do usuário ${user.id} salva no cache Redis`)
+    console.log(`💾 Session for user ${user.id} saved to Redis cache`)
     
     res.json({
       success: true,
@@ -133,70 +133,70 @@ router.post('/login', async (req, res) => {
         },
         token
       },
-      message: 'Login realizado com sucesso',
+      message: 'Login successful',
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    console.error('❌ Erro ao fazer login:', error)
+    console.error('❌ Error logging in:', error)
     res.status(500).json({
       success: false,
-      error: 'Erro interno do servidor',
+      error: 'Internal server error',
       message: error.message
     })
   }
 })
 
-// POST /api/auth/logout - Logout do usuário
+// POST /api/auth/logout - User logout
 router.post('/logout', async (req, res) => {
   try {
     const { userId } = req.body
     
     if (userId) {
-      // Limpar sessão do cache
+      // Clear session from cache
       const sessionKey = `session:${userId}`
       await deleteCache(sessionKey)
-      console.log(`🧹 Sessão do usuário ${userId} limpa do cache Redis`)
+      console.log(`🧹 Session for user ${userId} cleared from Redis cache`)
     }
     
     res.json({
       success: true,
-      message: 'Logout realizado com sucesso',
+      message: 'Logout successful',
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    console.error('❌ Erro ao fazer logout:', error)
+    console.error('❌ Error logging out:', error)
     res.status(500).json({
       success: false,
-      error: 'Erro interno do servidor',
+      error: 'Internal server error',
       message: error.message
     })
   }
 })
 
-// GET /api/auth/profile - Perfil do usuário (com cache)
+// GET /api/auth/profile - User profile (with cache)
 router.get('/profile', async (req, res) => {
   try {
-    // Extrair token do header Authorization
+    // Extract token from Authorization header
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: 'Token de autenticação necessário'
+        error: 'Authentication token required'
       })
     }
     
     const token = authHeader.substring(7)
     
-    // Verificar JWT
+    // Verify JWT
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const userId = decoded.userId
     
-    // Tentar obter do cache primeiro
+    // Try to get from cache first
     const sessionKey = `session:${userId}`
     let userSession = await getCache(sessionKey)
     
     if (userSession) {
-      console.log(`📦 Perfil do usuário ${userId} obtido do cache Redis`)
+      console.log(`📦 User profile for ${userId} obtained from Redis cache`)
       return res.json({
         success: true,
         data: userSession,
@@ -205,18 +205,18 @@ router.get('/profile', async (req, res) => {
       })
     }
     
-    // Se não estiver no cache, buscar do banco
-    console.log(`🗄️ Buscando perfil do usuário ${userId} do PostgreSQL`)
+    // If not in cache, fetch from database
+    console.log(`🗄️ Fetching user profile for ${userId} from PostgreSQL`)
     const user = await User.findById(userId)
     
     if (!user) {
       return res.status(404).json({
         success: false,
-        error: 'Usuário não encontrado'
+        error: 'User not found'
       })
     }
     
-    // Salvar no cache por 1 hora (3600 segundos)
+    // Save to cache for 1 hour (3600 seconds)
     await setCache(sessionKey, {
       userId: user.id,
       name: user.name,
@@ -225,7 +225,7 @@ router.get('/profile', async (req, res) => {
       lastLogin: new Date().toISOString()
     }, 3600)
     
-    console.log(`💾 Perfil do usuário ${userId} salvo no cache Redis`)
+    console.log(`💾 User profile for ${userId} saved to Redis cache`)
     
     res.json({
       success: true,
@@ -242,30 +242,30 @@ router.get('/profile', async (req, res) => {
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        error: 'Token inválido'
+        error: 'Invalid token'
       })
     }
     
-    console.error('❌ Erro ao buscar perfil:', error)
+    console.error('❌ Error fetching profile:', error)
     res.status(500).json({
       success: false,
-      error: 'Erro interno do servidor',
+      error: 'Internal server error',
       message: error.message
     })
   }
 })
 
-// GET /api/auth/users - Listar todos os usuários (com cache, apenas admin)
+// GET /api/auth/users - List all users (with cache, only admin)
 router.get('/users', async (req, res) => {
   try {
-    // Verificar se é admin (implementar middleware de autorização)
+    // Check if admin (implement authorization middleware)
     const cacheKey = 'users:all'
     
-    // Tentar obter do cache primeiro
+    // Try to get from cache first
     let users = await getCache(cacheKey)
     
     if (users) {
-      console.log('📦 Usuários obtidos do cache Redis')
+      console.log('📦 Users obtained from Redis cache')
       return res.json({
         success: true,
         data: users,
@@ -274,11 +274,11 @@ router.get('/users', async (req, res) => {
       })
     }
     
-    // Se não estiver no cache, buscar do banco
-    console.log('🗄️ Buscando usuários do PostgreSQL')
+    // If not in cache, fetch from database
+    console.log('🗄️ Fetching users from PostgreSQL')
     users = await User.findAll()
     
-    // Remover senhas dos dados
+    // Remove passwords from data
     const safeUsers = users.map(user => ({
       id: user.id,
       name: user.name,
@@ -288,9 +288,9 @@ router.get('/users', async (req, res) => {
       updated_at: user.updated_at
     }))
     
-    // Salvar no cache por 10 minutos (600 segundos)
+    // Save to cache for 10 minutes (600 seconds)
     await setCache(cacheKey, safeUsers, 600)
-    console.log('💾 Usuários salvos no cache Redis')
+    console.log('💾 Users saved to Redis cache')
     
     res.json({
       success: true,
@@ -299,10 +299,10 @@ router.get('/users', async (req, res) => {
       timestamp: new Date().toISOString()
     })
   } catch (error) {
-    console.error('❌ Erro ao buscar usuários:', error)
+    console.error('❌ Error fetching users:', error)
     res.status(500).json({
       success: false,
-      error: 'Erro interno do servidor',
+      error: 'Internal server error',
       message: error.message
     })
   }

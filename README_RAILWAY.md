@@ -1,10 +1,10 @@
-# 🚀 WeaveCode - Plataforma SaaS no Railway
+# 🚀 WeaveCode - SaaS Platform on Railway
 ## info@weavecode.co.uk
 
-### 📋 Visão Geral
-WeaveCode é uma plataforma SaaS moderna construída com React, Node.js e PostgreSQL, hospedada no Railway para máxima escalabilidade e facilidade de deploy.
+### 📋 General Overview
+WeaveCode is a modern SaaS platform built with React, Node.js, and PostgreSQL, hosted on Railway for maximum scalability and ease of deployment.
 
-### 🏗️ Arquitetura
+### 🏗️ Architecture
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Frontend      │    │    Backend      │    │   PostgreSQL    │
@@ -21,7 +21,7 @@ WeaveCode é uma plataforma SaaS moderna construída com React, Node.js e Postgr
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-### 🛠️ Stack Tecnológica
+### 🛠️ Technical Stack
 - **Frontend**: React 19 + Vite + Tailwind CSS
 - **Backend**: Node.js + Express + Prisma
 - **Database**: PostgreSQL (Railway)
@@ -29,34 +29,34 @@ WeaveCode é uma plataforma SaaS moderna construída com React, Node.js e Postgr
 - **Chat**: Chatwoot (Ruby on Rails)
 - **Deploy**: Railway + GitHub Actions
 - **ORM**: Prisma
-- **Autenticação**: JWT
-- **Pagamentos**: Stripe + PayPal
+- **Authentication**: JWT
+- **Payments**: Stripe + PayPal
 - **Email**: SendGrid
 
-### 🚀 Deploy Rápido
+### 🚀 Quick Deploy
 
-#### 1. Pré-requisitos
+#### 1. Prerequisites
 ```bash
-# Instalar Railway CLI
+# Install Railway CLI
 npm install -g @railway/cli
 
-# Login no Railway
+# Login to Railway
 railway login
 ```
 
-#### 2. Configurar Projeto
+#### 2. Configure Project
 ```bash
-# Clonar repositório
+# Clone repository
 git clone https://github.com/weavecode/weavecode.git
 cd weavecode
 
-# Inicializar projeto Railway
+# Initialize Railway project
 railway init
 
-# Configurar variáveis de ambiente
-railway variables set DATABASE_URL="sua-url-postgresql"
-railway variables set JWT_SECRET="seu-jwt-secret"
-railway variables set STRIPE_SECRET_KEY="sua-stripe-key"
+# Configure environment variables
+railway variables set DATABASE_URL="your-postgresql-url"
+railway variables set JWT_SECRET="your-jwt-secret"
+railway variables set STRIPE_SECRET_KEY="your-stripe-key"
 ```
 
 #### 3. Deploy
@@ -74,7 +74,7 @@ cd chatwoot
 railway up
 ```
 
-### 🔧 Variáveis de Ambiente
+### 🔧 Environment Variables
 
 #### Backend
 ```env
@@ -100,13 +100,13 @@ VITE_APP_VERSION="1.0.0"
 - **Frontend**: `/`
 - **Chatwoot**: `/health`
 
-### 🔄 Deploy Automático
-O projeto está configurado com GitHub Actions para deploy automático:
-- Push para `main` → Deploy automático
-- Pull Request → Execução de testes
-- Deploy separado para cada serviço
+### 🔄 Automatic Deployment
+The project is configured with GitHub Actions for automatic deployment:
+- Push to `main` → Automatic deployment
+- Pull Request → Execution of tests
+- Separate deployment for each service
 
-### 🧪 Desenvolvimento Local
+### 🧪 Development Locally
 
 #### Backend
 ```bash
@@ -124,113 +124,111 @@ npm run dev
 
 #### Database
 ```bash
-# Usar PostgreSQL local ou Railway
+# Use local PostgreSQL or Railway
 cd backend
 npm run prisma:generate
 npm run prisma:migrate:dev
 ```
 
-### 📁 Estrutura do Projeto
+### 📁 Project Structure
 ```
 weavecode/
 ├── backend/                 # API Node.js
 │   ├── src/
 │   │   ├── lib/            # Prisma client
-│   │   ├── middleware/     # Autenticação
-│   │   ├── models/         # Modelos Prisma
-│   │   └── routes/         # Rotas da API
-│   ├── prisma/             # Schema e migrações
-│   ├── railway.json        # Configuração Railway
+│   │   ├── middleware/     # Authentication
+│   │   ├── models/         # Prisma models
+│   │   └── routes/         # API routes
+│   ├── prisma/             # Schema and migrations
+│   ├── railway.json        # Railway configuration
 │   └── package.json
-├── frontend/                # App React
+├── frontend/                # React App
 │   ├── src/
-│   │   ├── pages/          # Páginas da aplicação
-│   │   ├── lib/            # Utilitários e API
-│   │   └── assets/         # Recursos estáticos
-│   ├── railway.json        # Configuração Railway
+│   │   ├── pages/          # Application pages
+│   │   ├── lib/            # Utilities and API
+│   │   └── assets/         # Static resources
+│   ├── railway.json        # Railway configuration
 │   └── package.json
-├── chatwoot/                # Chatbot personalizado
-│   ├── railway.json        # Configuração Railway
+├── chatwoot/                # Custom Chatbot
+│   ├── railway.json        # Railway configuration
 │   └── ...
 ├── .github/                 # GitHub Actions
 │   └── workflows/
 │       └── deploy-railway.yml
-├── scripts/                 # Scripts de automação
+├── scripts/                 # Automation scripts
 │   ├── migrate-to-railway.ps1
 │   └── cleanup-docker.ps1
-└── README_RAILWAY.md        # Este arquivo
+└── README_RAILWAY.md        # This file
 ```
 
-### 🎯 Funcionalidades
+### 🎯 Features
 
-#### Sistema de Usuários
-- ✅ Registro e login
-- ✅ Autenticação JWT
-- ✅ Controle de acesso por roles
-- ✅ Perfis de usuário
+#### User System
+- ✅ Registration and login
+- ✅ User authentication
+- ✅ User profiles
 
-#### Gestão de Clientes
-- ✅ CRUD de clientes
-- ✅ Histórico de interações
-- ✅ Notas e observações
-- ✅ Sistema de tags
+#### Customer Management
+- ✅ Customer CRUD
+- ✅ Notes and observations
+- ✅ System of tags
 
-#### Sistema de Pagamentos
-- ✅ Integração Stripe
-- ✅ Integração PayPal
-- ✅ Webhooks seguros
-- ✅ Histórico de transações
+#### Payment System
+- ✅ Stripe integration
+- ✅ PayPal integration
+- ✅ Secure webhooks
+- ✅ Transaction history
 
-#### Sistema de Email
-- ✅ Templates personalizados
-- ✅ Envio via SendGrid
-- ✅ Rastreamento de entrega
-- ✅ Listas de distribuição
+#### Email System
+- ✅ Custom templates
+- ✅ Send via SendGrid
+- ✅ Delivery tracking
+- ✅ Distribution lists
 
-#### Chatwoot Personalizado
-- ✅ Chatbot inteligente
-- ✅ Integração com CRM
-- ✅ Histórico de conversas
-- ✅ Relatórios e analytics
+#### Custom Chatwoot
+- ✅ Intelligent chatbot
+- ✅ CRM integration
+- ✅ Conversation history
+- ✅ Reports and analytics
 
-### 📈 Monitoramento
-- **Railway Dashboard**: Métricas de performance
-- **Logs**: Acesso em tempo real
-- **Health Checks**: Status automático dos serviços
-- **GitHub Actions**: Histórico de deploys
+### 📈 Monitoring
+- **Railway Dashboard**: Performance metrics
+- **Logs**: Real-time access
+- **Health Checks**: Automatic status of services
+- **GitHub Actions**: Deployment history
 
-### 🔒 Segurança
-- **HTTPS**: Forçado em produção
-- **CORS**: Configurado adequadamente
-- **Helmet**: Headers de segurança
-- **JWT**: Autenticação stateless
-- **Rate Limiting**: Proteção contra abuso
-- **Input Validation**: Sanitização de dados
+### 🔒 Security
+- **HTTPS**: Forced in production
+- **CORS**: Properly configured
+- **Helmet**: Security headers
+- **JWT**: Stateless authentication
+- **Rate Limiting**: Protection against abuse
+- **Input Validation**: Data sanitization
 
-### 💰 Custos
-- **Railway Hobby**: $5 mínimo/mês (desenvolvimento)
-- **Railway Pro**: $20/mês (produção)
-- **PostgreSQL**: Incluído no plano Railway
-- **Redis**: Incluído no plano Railway
+### 💰 Costs
+- **Railway Hobby**: $5 minimum/month (development)
+- **Railway Pro**: $20/month (production)
+- **PostgreSQL**: Included in Railway plan
+- **Redis**: Included in Railway plan
 
-### 🆘 Suporte
+### 🆘 Support
 - **Email**: info@weavecode.co.uk
-- **Documentação**: Este README
+- **Documentation**: This README
 - **Railway Docs**: https://docs.railway.app
 - **Issues**: GitHub Issues
 
-### 🚀 Próximos Passos
-1. **Configurar domínios personalizados**
-2. **Implementar analytics avançados**
-3. **Adicionar testes automatizados**
-4. **Configurar backup automático**
-5. **Implementar CDN para assets**
-6. **Adicionar monitoramento de performance**
+### 🚀 Next Steps
+1. **Configure custom domains**
+2. **Implement advanced analytics**
+3. **Add automated tests**
+4. **Configure automatic backup**
+5. **Implement CDN for assets**
+6. **Add performance monitoring**
 
 ---
 
-**Versão**: 1.0.0
-**Última Atualização**: $(Get-Date -Format "dd/MM/yyyy")
-**Status**: Produção no Railway
-**Empresa**: WeaveCode
+**Version**: 1.0.0
+**Last Update**: $(Get-Date -Format "dd/MM/yyyy")
+**Status**: Production on Railway
+**Company**: WeaveCode
 **Email**: info@weavecode.co.uk

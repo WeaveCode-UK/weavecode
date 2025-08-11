@@ -1,67 +1,67 @@
-# 🚀 WeaveCode - Plataforma de Soluções Web
+# 🚀 WeaveCode - Web Solutions Platform
 
-**Empresa**: WeaveCode  
+**Company**: WeaveCode  
 **Email**: info@weavecode.co.uk  
 **Stack**: React + Node.js + PostgreSQL + Railway  
-**Status**: Produção no Railway 🚀
+**Status**: Production on Railway 🚀
 
-## 🏗️ Arquitetura
+## 🏗️ Architecture
 
 ### Frontend
-- **React.js** (Vite) - SPA moderna
-- **JavaScript ES6+** - Código moderno
-- **TailwindCSS** - Estilização utilitária
-- **React Router** - Navegação SPA
+- **React.js** (Vite) - Modern SPA
+- **JavaScript ES6+** - Modern code
+- **TailwindCSS** - Utility styling
+- **React Router** - SPA navigation
 
 ### Backend
-- **Node.js** - Runtime JavaScript
-- **Express.js** - Framework web
-- **JWT** - Autenticação segura
-- **Bcrypt** - Hash de senhas
-- **Prisma ORM** - Banco de dados
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web framework
+- **JWT** - Secure authentication
+- **Bcrypt** - Password hashing
+- **Prisma ORM** - Database
 
 ### Database
-- **PostgreSQL** - Banco relacional robusto (Railway)
-- **Redis** - Cache e sessões (Railway)
-- **Prisma** - ORM moderno
+- **PostgreSQL** - Robust relational database (Railway)
+- **Redis** - Cache and sessions (Railway)
+- **Prisma** - Modern ORM
 
-### Infraestrutura
-- **Railway** - Plataforma de deploy moderna
-- **GitHub Actions** - CI/CD automático
-- **Deploy automático** - Via GitHub
+### Infrastructure
+- **Railway** - Modern deployment platform
+- **GitHub Actions** - Automatic CI/CD
+- **Automatic deployment** - Via GitHub
 
-## 🚀 Deploy no Railway
+## 🚀 Deploy on Railway
 
-### Pré-requisitos
-- ✅ Conta Railway configurada
-- ✅ Railway CLI instalado
-- ✅ Projeto inicializado no Railway
+### Prerequisites
+- ✅ Railway account configured
+- ✅ Railway CLI installed
+- ✅ Project initialized on Railway
 
-### Configuração Rápida
+### Quick Configuration
 
-1. **Instalar Railway CLI:**
+1. **Install Railway CLI:**
 ```bash
 npm install -g @railway/cli
 ```
 
-2. **Login no Railway:**
+2. **Login to Railway:**
 ```bash
 railway login
 ```
 
-3. **Inicializar projeto:**
+3. **Initialize project:**
 ```bash
 railway init
 ```
 
-4. **Configurar variáveis de ambiente:**
+4. **Configure environment variables:**
 ```bash
-railway variables set DATABASE_URL="sua-url-postgresql"
-railway variables set JWT_SECRET="seu-jwt-secret"
-railway variables set STRIPE_SECRET_KEY="sua-stripe-key"
+railway variables set DATABASE_URL="your-postgresql-url"
+railway variables set JWT_SECRET="your-jwt-secret"
+railway variables set STRIPE_SECRET_KEY="your-stripe-key"
 ```
 
-5. **Deploy das aplicações:**
+5. **Deploy applications:**
 ```bash
 # Backend
 cd backend
@@ -72,18 +72,18 @@ cd frontend
 railway up
 ```
 
-### Scripts Disponíveis
+### Available Scripts
 
-- **`scripts/migrate-to-railway.ps1`** - Script de migração para Railway
-- **`scripts/cleanup-docker.ps1`** - Limpeza de arquivos Docker
+- **`scripts/migrate-to-railway.ps1`** - Railway migration script
+- **`scripts/cleanup-docker.ps1`** - Docker file cleanup
 
-## 🔧 Configuração Local
+## 🔧 Local Configuration
 
-### Instalação
+### Installation
 
 ```bash
-# Clonar repositório
-git clone https://github.com/SEU_USUARIO/weavecode.git
+# Clone repository
+git clone https://github.com/YOUR_USERNAME/weavecode.git
 cd weavecode
 
 # Frontend
@@ -97,56 +97,56 @@ npm install
 npm run dev
 ```
 
-### Variáveis de Ambiente
+### Environment Variables
 
 **Frontend** (`.env`):
 ```bash
 VITE_API_URL=http://localhost:4000
-VITE_STRIPE_PUBLISHABLE_KEY=sua_chave_stripe
+VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_key
 ```
 
 **Backend** (`.env`):
 ```bash
 NODE_ENV=development
 PORT=4000
-JWT_SECRET=sua_chave_jwt
+JWT_SECRET=your_jwt_key
 DATABASE_URL=postgresql://weavecode:weavecode123@localhost:5432/weavecode
-STRIPE_SECRET_KEY=sua_chave_stripe
-PAYPAL_CLIENT_ID=seu_paypal_client_id
-PAYPAL_CLIENT_SECRET=seu_paypal_client_secret
-SENDGRID_API_KEY=sua_chave_sendgrid
-CHATWOOT_API_KEY=sua_chave_chatwoot
+STRIPE_SECRET_KEY=your_stripe_key
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+SENDGRID_API_KEY=your_sendgrid_key
+CHATWOOT_API_KEY=your_chatwoot_key
 ```
 
-## 📱 Funcionalidades
+## 📱 Features
 
-### Implementadas
-- ✅ Autenticação JWT
-- ✅ CRUD de clientes
-- ✅ Sistema de preços
-- ✅ Estrutura de pagamentos (Stripe/PayPal)
-- ✅ Sistema de email (SendGrid)
-- ✅ Integração Chatwoot (stub)
+### Implemented
+- ✅ JWT authentication
+- ✅ Client CRUD
+- ✅ Price system
+- ✅ Payment structure (Stripe/PayPal)
+- ✅ Email system (SendGrid)
+- ✅ Chatwoot integration (stub)
 
-### Planejadas (Fase 2)
-- 🚧 Chatwoot completo (Ruby on Rails)
-- 🚧 Dashboard administrativo
-- 🚧 Relatórios e analytics
-- 🚧 Sistema de notificações
+### Planned (Phase 2)
+- 🚧 Complete Chatwoot (Ruby on Rails)
+- 🚧 Administrative dashboard
+- 🚧 Analytics and reports
+- 🚧 Notification system
 
-## 💰 Preços dos Serviços
+## 💰 Service Prices
 
-| Serviço | Descrição | Preço |
-|---------|-----------|-------|
-| **Landing Page** | Página institucional responsiva | £299 |
-| **E-commerce** | Loja virtual completa | £799 |
-| **Sistema Web** | Aplicação personalizada | £1,499 |
-| **API REST** | Backend para aplicações | £599 |
-| **Manutenção** | Suporte mensal | £99/mês |
+| Service | Description | Price |
+|---------|-------------|-------|
+| **Landing Page** | Responsive institutional page | £299 |
+| **E-commerce** | Complete online store | £799 |
+| **Web System** | Custom application | £1,499 |
+| **REST API** | Backend for applications | £599 |
+| **Maintenance** | Monthly support | £99/month |
 
-## 🆘 Suporte
+## 🆘 Support
 
-### Logs Importantes
+### Important Logs
 
 ```bash
 # Backend (Railway)
@@ -162,74 +162,74 @@ railway logs postgresql
 railway logs chatwoot
 ```
 
-### Comandos Úteis
+### Useful Commands
 
 ```bash
-# Status dos serviços
+# Service status
 railway status
 
-# Deploy das aplicações
+# Deploy applications
 railway up
 
-# Verificar variáveis de ambiente
+# Check environment variables
 railway variables
 
-# Acessar logs em tempo real
+# Access real-time logs
 railway logs -f
 ```
 
-## 🎯 Próximos Passos
+## 🎯 Next Steps
 
-1. ✅ **Railway configurado** - Infraestrutura moderna
-2. 🔄 **Deploy automático** - CI/CD funcionando
-3. 🌐 **Domínios configurados** - SSL automático
-4. 💳 **Pagamentos reais** - Stripe/PayPal
-5. 📧 **Email real** - SendGrid configurado
-6. 🚀 **Chatwoot** - Sistema de suporte
+1. ✅ **Railway configured** - Modern infrastructure
+2. 🔄 **Automatic deployment** - CI/CD working
+3. 🌐 **Domains configured** - Automatic SSL
+4. 💳 **Real payments** - Stripe/PayPal
+5. 📧 **Real email** - SendGrid configured
+6. 🚀 **Chatwoot** - Support system
 
-## 📚 Documentação
+## 📚 Documentation
 
-- **`README_RAILWAY.md`** - Documentação completa para Railway
-- **`RAILWAY_MIGRATION_GUIDE.md`** - Guia de migração
-- **`.github/workflows/deploy-railway.yml`** - Workflow CI/CD Railway
-- **`scripts/`** - Scripts de automação
+- **`README_RAILWAY.md`** - Complete Railway documentation
+- **`RAILWAY_MIGRATION_GUIDE.md`** - Migration guide
+- **`.github/workflows/deploy-railway.yml`** - Railway CI/CD workflow
+- **`scripts/`** - Automation scripts
 
-## 🎉 Status do Projeto
+## 🎉 Project Status
 
-**✅ COMPLETO:**
-- Frontend React + TailwindCSS
-- Backend Node.js + Express
-- Migração para Railway concluída
-- Deploy automático configurado
-- Documentação atualizada
+**✅ COMPLETE:**
+- React Frontend + TailwindCSS
+- Node.js Backend + Express
+- Railway migration completed
+- Automatic deployment configured
+- Documentation updated
 
-**🔄 EM PROGRESSO:**
-- Configuração de domínios personalizados
-- Testes de produção no Railway
+**🔄 IN PROGRESS:**
+- Custom domain configuration
+- Production testing on Railway
 
-**🚧 PRÓXIMAS FASES:**
-- Chatwoot completo
-- Dashboard administrativo
-- Analytics e relatórios
+**🚧 NEXT PHASES:**
+- Complete Chatwoot
+- Administrative dashboard
+- Analytics and reports
 
-## 🚀 Deploy Automático
+## 🚀 Automatic Deployment
 
-O projeto está configurado com GitHub Actions para deploy automático no Railway:
+The project is configured with GitHub Actions for automatic deployment on Railway:
 
-- **Push para `main`** → Deploy automático
-- **Pull Request** → Execução de testes
-- **Deploy separado** para backend e frontend
+- **Push to `main`** → Automatic deployment
+- **Pull Request** → Test execution
+- **Separate deployment** for backend and frontend
 
-## 💰 Custos Railway
+## 💰 Railway Costs
 
-- **Railway Hobby**: $5 mínimo/mês (desenvolvimento)
-- **Railway Pro**: $20/mês (produção)
-- **PostgreSQL**: Incluído no plano Railway
-- **Redis**: Incluído no plano Railway
+- **Railway Hobby**: $5 minimum/month (development)
+- **Railway Pro**: $20/month (production)
+- **PostgreSQL**: Included in Railway plan
+- **Redis**: Included in Railway plan
 
 ---
 
-**Empresa**: WeaveCode  
+**Company**: WeaveCode  
 **Email**: info@weavecode.co.uk  
 **Stack**: React + Node.js + PostgreSQL + Railway  
-**Status**: Produção no Railway 🚀
+**Status**: Production on Railway 🚀
