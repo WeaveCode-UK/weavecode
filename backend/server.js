@@ -3,7 +3,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
-import prisma from './src/lib/prisma.js'
+import { testConnection, createTables, checkTables } from './src/lib/models.js'
 import authRouter from './src/routes/auth.js'
 import paymentsRouter from './src/routes/payments.js'
 import supportRouter from './src/routes/support.js'
@@ -22,10 +22,31 @@ app.use(morgan('dev'))
 
 app.get('/api/health', async (_req, res) => {
   try {
-    await prisma.$queryRaw`SELECT 1;`
-    res.json({ ok: true, service: 'weavecode-backend', db: 'postgres', time: new Date().toISOString() })
-  } catch {
-    res.status(500).json({ ok: false, service: 'weavecode-backend', db: 'postgres', error: 'db' })
+    const dbStatus = await testConnection()
+    if (dbStatus) {
+      res.json({ 
+        ok: true, 
+        service: 'weavecode-backend', 
+        db: 'postgres', 
+        time: new Date().toISOString(),
+        connection: 'direct-pg'
+      })
+    } else {
+      res.status(500).json({ 
+        ok: false, 
+        service: 'weavecode-backend', 
+        db: 'postgres', 
+        error: 'db-connection-failed' 
+      })
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      ok: false, 
+      service: 'weavecode-backend', 
+      db: 'postgres', 
+      error: 'db-error',
+      message: error.message 
+    })
   }
 })
 
@@ -37,19 +58,40 @@ app.use('/api/customers', customersRouter)
 
 async function start() {
   try {
-    await prisma.$connect()
-    console.log('Prisma connected to Postgres')
+    // Testar conexão PostgreSQL
+    console.log('🔌 Testando conexão PostgreSQL...')
+    const connectionOk = await testConnection()
+    
+    if (!connectionOk) {
+      throw new Error('Falha na conexão com PostgreSQL')
+    }
+    
+    // Verificar tabelas existentes
+    console.log('📋 Verificando tabelas...')
+    const tables = await checkTables()
+    
+    // Criar tabelas se não existirem
+    if (!tables.users || !tables.customers) {
+      console.log('🏗️ Criando tabelas...')
+      await createTables()
+    }
+    
+    console.log('✅ PostgreSQL conectado via driver pg')
+    console.log('✅ Tabelas verificadas/criadas')
+    
   } catch (e) {
-    console.error('Failed to connect to Postgres via Prisma:', e)
+    console.error('❌ Falha na conexão com PostgreSQL:', e)
     process.exit(1)
   }
+  
   app.listen(port, () => {
-    console.log(`API listening on http://localhost:${port}`)
+    console.log(`🚀 API listening on http://localhost:${port}`)
+    console.log(`🌐 Health check: http://localhost:${port}/api/health`)
   })
 }
 
 start().catch((e) => {
-  console.error('Fatal start error:', e)
+  console.error('💥 Fatal start error:', e)
   process.exit(1)
 })
 
