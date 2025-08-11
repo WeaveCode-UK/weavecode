@@ -1,17 +1,21 @@
 import { Router } from 'express'
-import prisma from '../lib/prisma.js'
+import { Customer } from '../lib/models.js'
 import requireAuth from '../middleware/requireAuth.js'
 
 const router = Router()
 
 router.get('/', requireAuth, async (_req, res) => {
-  const customers = await prisma.customer.findMany({ orderBy: { createdAt: 'desc' } })
-  res.json(customers)
+  try {
+    const customers = await Customer.findAll()
+    res.json(customers)
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
 })
 
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const customer = await prisma.customer.create({ data: req.body })
+    const customer = await Customer.create(req.body)
     res.status(201).json(customer)
   } catch (e) {
     res.status(400).json({ error: e.message })
@@ -20,20 +24,24 @@ router.post('/', requireAuth, async (req, res) => {
 
 router.put('/:id', requireAuth, async (req, res) => {
   try {
-    const updated = await prisma.customer.update({ where: { id: req.params.id }, data: req.body })
+    const updated = await Customer.update(req.params.id, req.body)
+    if (!updated) {
+      return res.status(404).json({ error: 'Customer not found' })
+    }
     res.json(updated)
   } catch (e) {
-    if (e.code === 'P2025') return res.status(404).json({ error: 'Not found' })
     res.status(400).json({ error: e.message })
   }
 })
 
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await prisma.customer.delete({ where: { id: req.params.id } })
-    res.json({ ok: true })
+    const deleted = await Customer.delete(req.params.id)
+    if (!deleted) {
+      return res.status(404).json({ error: 'Customer not found' })
+    }
+    res.json({ ok: true, deleted })
   } catch (e) {
-    if (e.code === 'P2025') return res.status(404).json({ error: 'Not found' })
     res.status(400).json({ error: e.message })
   }
 })

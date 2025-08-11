@@ -28,10 +28,6 @@ jobs:
       working-directory: ./backend
       run: npm ci
     
-    - name: Generate Prisma Client
-      working-directory: ./backend
-      run: npm run prisma:generate
-    
     - name: Deploy Backend to Railway
       working-directory: ./backend
       run: |
