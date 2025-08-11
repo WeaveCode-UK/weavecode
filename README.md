@@ -2,7 +2,8 @@
 
 **Empresa**: WeaveCode  
 **Email**: info@weavecode.co.uk  
-**Stack**: Full-Stack Moderno com VPS
+**Stack**: React + Node.js + PostgreSQL + Railway  
+**Status**: Produção no Railway 🚀
 
 ## 🏗️ Arquitetura
 
@@ -20,54 +21,61 @@
 - **Prisma ORM** - Banco de dados
 
 ### Database
-- **PostgreSQL** - Banco relacional robusto
-- **Redis** - Cache e sessões
+- **PostgreSQL** - Banco relacional robusto (Railway)
+- **Redis** - Cache e sessões (Railway)
 - **Prisma** - ORM moderno
 
 ### Infraestrutura
-- **VPS Hetzner** - Hosting econômico
-- **Docker** - Containerização
-- **Caddy** - Reverse proxy + SSL automático
+- **Railway** - Plataforma de deploy moderna
 - **GitHub Actions** - CI/CD automático
+- **Deploy automático** - Via GitHub
 
-## 🚀 Deploy na VPS
+## 🚀 Deploy no Railway
 
 ### Pré-requisitos
-- ✅ VPS Hetzner CX32 configurada
-- ✅ IP público da VPS
-- ✅ Chave SSH configurada
+- ✅ Conta Railway configurada
+- ✅ Railway CLI instalado
+- ✅ Projeto inicializado no Railway
 
 ### Configuração Rápida
 
-1. **Conectar na VPS:**
+1. **Instalar Railway CLI:**
 ```bash
-ssh root@SEU_IP_DA_VPS
+npm install -g @railway/cli
 ```
 
-2. **Executar script de configuração:**
+2. **Login no Railway:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/SEU_USUARIO/weavecode/main/deploy/vps-setup.sh -o vps-setup.sh
-chmod +x vps-setup.sh
-./vps-setup.sh
+railway login
 ```
 
-3. **Configurar variáveis de ambiente:**
+3. **Inicializar projeto:**
 ```bash
-nano /opt/weavecode/.env
+railway init
 ```
 
-4. **Primeiro deploy:**
+4. **Configurar variáveis de ambiente:**
 ```bash
-cd /opt/weavecode
-./deploy.sh
+railway variables set DATABASE_URL="sua-url-postgresql"
+railway variables set JWT_SECRET="seu-jwt-secret"
+railway variables set STRIPE_SECRET_KEY="sua-stripe-key"
+```
+
+5. **Deploy das aplicações:**
+```bash
+# Backend
+cd backend
+railway up
+
+# Frontend
+cd frontend
+railway up
 ```
 
 ### Scripts Disponíveis
 
-- **`vps-setup.sh`** - Configuração automática da VPS
-- **`health-check.sh`** - Monitoramento de saúde
-- **`backup-postgres.sh`** - Backup automático do banco
-- **`deploy.sh`** - Deploy automático
+- **`scripts/migrate-to-railway.ps1`** - Script de migração para Railway
+- **`scripts/cleanup-docker.ps1`** - Limpeza de arquivos Docker
 
 ## 🔧 Configuração Local
 
@@ -110,110 +118,6 @@ SENDGRID_API_KEY=sua_chave_sendgrid
 CHATWOOT_API_KEY=sua_chave_chatwoot
 ```
 
-## 🐳 Docker
-
-### Build da Imagem
-
-```bash
-# Backend
-cd backend
-docker build -t weavecode-backend:latest .
-
-# Frontend (opcional)
-cd ../frontend
-docker build -t weavecode-frontend:latest .
-```
-
-### Docker Compose
-
-```bash
-# Produção
-docker-compose -f deploy/docker-compose.prod.yml up -d
-
-# Desenvolvimento
-docker-compose up -d
-```
-
-## 🔄 CI/CD
-
-### GitHub Actions
-
-**Workflows disponíveis:**
-- **`ci.yml`** - Build e teste
-- **`deploy-vps.yml`** - Deploy automático para VPS
-
-### Secrets Necessários
-
-Configure no GitHub (`Settings` > `Secrets` > `Actions`):
-
-- `VPS_HOST` - IP da VPS
-- `VPS_USER` - Usuário SSH (root)
-- `VPS_SSH_KEY` - Chave SSH privada
-- `VPS_PORT` - Porta SSH (22)
-
-## 📊 Monitoramento
-
-### Health Checks
-
-```bash
-# Verificar saúde dos serviços
-/opt/weavecode/health-check.sh
-
-# Ver logs em tempo real
-tail -f /opt/weavecode/logs/health.log
-tail -f /opt/weavecode/logs/alerts.log
-```
-
-### Backups
-
-```bash
-# Backup manual
-/opt/weavecode/backup-postgres.sh
-
-# Verificar backups
-ls -la /opt/weavecode/backups/
-```
-
-## 🔒 Segurança
-
-### Configurado Automaticamente
-
-- ✅ Firewall UFW (portas 22, 80, 443)
-- ✅ Headers de segurança (Caddy)
-- ✅ Rate limiting para API
-- ✅ Backup automático
-- ✅ Monitoramento contínuo
-
-### Recomendações Adicionais
-
-- 🔑 Trocar senha padrão do PostgreSQL
-- 🔑 Configurar fail2ban para SSH
-- 🔑 Monitorar logs regularmente
-- 🔑 Atualizar sistema regularmente
-
-## 🌐 Domínio e SSL
-
-### Configuração de Domínio
-
-1. **Editar Caddyfile:**
-```bash
-nano /etc/caddy/Caddyfile
-```
-
-2. **Substituir comentários:**
-```caddy
-# De:
-# tls seu-email@weavecode.co.uk
-
-# Para:
-tls seu-email@weavecode.co.uk
-```
-
-3. **Reiniciar Caddy:**
-```bash
-systemctl restart caddy
-```
-
 ## 📱 Funcionalidades
 
 ### Implementadas
@@ -225,7 +129,7 @@ systemctl restart caddy
 - ✅ Integração Chatwoot (stub)
 
 ### Planejadas (Fase 2)
-- 🚧 Chatwoot completo (Java/Spring)
+- 🚧 Chatwoot completo (Ruby on Rails)
 - 🚧 Dashboard administrativo
 - 🚧 Relatórios e analytics
 - 🚧 Sistema de notificações
@@ -245,66 +149,87 @@ systemctl restart caddy
 ### Logs Importantes
 
 ```bash
-# Backend
-docker logs weavecode-backend
+# Backend (Railway)
+railway logs backend
 
-# PostgreSQL
-docker logs weavecode-postgres
+# Frontend (Railway)
+railway logs frontend
 
-# Caddy
-journalctl -u caddy -f
+# PostgreSQL (Railway)
+railway logs postgresql
 
-# Sistema
-tail -f /opt/weavecode/logs/health.log
+# Chatwoot (Railway)
+railway logs chatwoot
 ```
 
 ### Comandos Úteis
 
 ```bash
 # Status dos serviços
-docker ps
-systemctl status caddy
+railway status
 
-# Reiniciar serviços
-docker-compose restart
-systemctl restart caddy
+# Deploy das aplicações
+railway up
 
-# Verificar conectividade
-netstat -tlnp
-ufw status
+# Verificar variáveis de ambiente
+railway variables
+
+# Acessar logs em tempo real
+railway logs -f
 ```
 
 ## 🎯 Próximos Passos
 
-1. ✅ **VPS configurada** - Infraestrutura pronta
+1. ✅ **Railway configurado** - Infraestrutura moderna
 2. 🔄 **Deploy automático** - CI/CD funcionando
-3. 🌐 **Domínio configurado** - SSL automático
+3. 🌐 **Domínios configurados** - SSL automático
 4. 💳 **Pagamentos reais** - Stripe/PayPal
 5. 📧 **Email real** - SendGrid configurado
 6. 🚀 **Chatwoot** - Sistema de suporte
 
 ## 📚 Documentação
 
-- **`deploy/VPS_SETUP_GUIDE.md`** - Guia completo da VPS
-- **`deploy/docker-compose.prod.yml`** - Docker Compose produção
-- **`deploy/Caddyfile`** - Configuração Caddy
-- **`.github/workflows/`** - Workflows CI/CD
+- **`README_RAILWAY.md`** - Documentação completa para Railway
+- **`RAILWAY_MIGRATION_GUIDE.md`** - Guia de migração
+- **`.github/workflows/deploy-railway.yml`** - Workflow CI/CD Railway
+- **`scripts/`** - Scripts de automação
 
 ## 🎉 Status do Projeto
 
 **✅ COMPLETO:**
 - Frontend React + TailwindCSS
 - Backend Node.js + Express
-- Database PostgreSQL + Prisma
-- VPS Hetzner configurada
-- Docker + Docker Compose
-- Caddy (reverse proxy + SSL)
-- Backup automático
-- Monitoramento contínuo
-- CI/CD GitHub Actions
+- Migração para Railway concluída
+- Deploy automático configurado
+- Documentação atualizada
 
-**🚀 PRONTO PARA PRODUÇÃO!**
+**🔄 EM PROGRESSO:**
+- Configuração de domínios personalizados
+- Testes de produção no Railway
+
+**🚧 PRÓXIMAS FASES:**
+- Chatwoot completo
+- Dashboard administrativo
+- Analytics e relatórios
+
+## 🚀 Deploy Automático
+
+O projeto está configurado com GitHub Actions para deploy automático no Railway:
+
+- **Push para `main`** → Deploy automático
+- **Pull Request** → Execução de testes
+- **Deploy separado** para backend e frontend
+
+## 💰 Custos Railway
+
+- **Railway Hobby**: $5 mínimo/mês (desenvolvimento)
+- **Railway Pro**: $20/mês (produção)
+- **PostgreSQL**: Incluído no plano Railway
+- **Redis**: Incluído no plano Railway
 
 ---
 
-**WeaveCode** - Transformando ideias em soluções web inovadoras! 🚀
+**Empresa**: WeaveCode  
+**Email**: info@weavecode.co.uk  
+**Stack**: React + Node.js + PostgreSQL + Railway  
+**Status**: Produção no Railway 🚀
