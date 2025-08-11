@@ -5,6 +5,7 @@ import morgan from 'morgan'
 import dotenv from 'dotenv'
 import { testConnection } from './src/lib/postgres.js'
 import { createTables, checkTables } from './src/lib/models.js'
+import { connectRedis, testRedisConnection } from './src/lib/redis.js'
 import authRouter from './src/routes/auth.js'
 import paymentsRouter from './src/routes/payments.js'
 import supportRouter from './src/routes/support.js'
@@ -24,20 +25,24 @@ app.use(morgan('dev'))
 app.get('/api/health', async (_req, res) => {
   try {
     const dbStatus = await testConnection()
-    if (dbStatus) {
+    const redisStatus = await testRedisConnection()
+    
+    if (dbStatus && redisStatus) {
       res.json({ 
         ok: true, 
         service: 'weavecode-backend', 
         db: 'postgres', 
+        cache: 'redis',
         time: new Date().toISOString(),
-        connection: 'direct-pg'
+        connection: 'direct-pg + redis'
       })
     } else {
       res.status(500).json({ 
         ok: false, 
         service: 'weavecode-backend', 
         db: 'postgres', 
-        error: 'db-connection-failed' 
+        cache: 'redis',
+        error: 'db-or-redis-connection-failed' 
       })
     }
   } catch (error) {
@@ -45,6 +50,7 @@ app.get('/api/health', async (_req, res) => {
       ok: false, 
       service: 'weavecode-backend', 
       db: 'postgres', 
+      cache: 'redis',
       error: 'db-error',
       message: error.message 
     })
@@ -67,6 +73,14 @@ async function start() {
       throw new Error('Falha na conexão com PostgreSQL')
     }
     
+    // Conectar Redis
+    console.log('🔌 Conectando Redis...')
+    const redisOk = await connectRedis()
+    
+    if (!redisOk) {
+      console.warn('⚠️ Redis não disponível, continuando sem cache')
+    }
+    
     // Verificar tabelas existentes
     console.log('📋 Verificando tabelas...')
     const tables = await checkTables()
@@ -78,10 +92,13 @@ async function start() {
     }
     
     console.log('✅ PostgreSQL conectado via driver pg')
+    if (redisOk) {
+      console.log('✅ Redis conectado e funcionando')
+    }
     console.log('✅ Tabelas verificadas/criadas')
     
   } catch (e) {
-    console.error('❌ Falha na conexão com PostgreSQL:', e)
+    console.error('❌ Falha na inicialização:', e)
     process.exit(1)
   }
   
